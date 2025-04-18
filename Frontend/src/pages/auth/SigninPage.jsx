@@ -54,9 +54,6 @@ const SigninPage = () => {
                 </div>
                 <Input id="email" name="email" type="email" label="Email Address" placeholder="you@example.com" value={formData.email} onChange={handleInputChange} icon={Mail} required disabled={loading} autoComplete="email" />
                 <Input id="password" name="password" type="password" label="Password" placeholder="Enter your password" value={formData.password} onChange={handleInputChange} icon={Lock} showPasswordToggle={true} required disabled={loading} autoComplete="current-password" />
-                <div className="flex justify-end text-sm">
-                    <Button type="button" variant="link" className="p-0 h-auto text-xs" disabled={loading}> Forgot Password? </Button>
-                </div>
                 <Button type="submit" variant="primary" size="lg" className="w-full" isLoading={loading} disabled={loading}> Sign in </Button>
             </form>
         </AuthFormWrapper>

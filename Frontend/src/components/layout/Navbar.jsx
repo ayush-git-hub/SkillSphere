@@ -11,12 +11,7 @@ import { useToast } from "../../hooks/useToast";
 
 const LogoIcon = () => (
     <Link to="/explore" className="flex items-center gap-2 flex-shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm" aria-label="Go to homepage">
-        <svg width="20" height="20" xmlns="http://www.w3.org/2000/svg">
-            <path d="M100,150 C80,120 60,100 40,80 C20,60 30,40 50,30 C70,20 90,30 110,40 C130,50 150,70 170,90 C190,110 180,130 160,140 Z" fill="none" stroke="black" stroke-width="2" />
-            <path d="M110,40 L120,30 L130,20 L140,30 L150,40" fill="black" />
-            <circle cx="100" cy="150" r="50" fill="none" stroke="black" stroke-width="2" />
-        </svg>
-        <span className="font-semibold hidden sm:inline text-foreground">LMS Platform</span>
+        <span className="font-semibold hidden sm:inline text-foreground">Skill Sphere</span>
     </Link>
 );
 

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import AuthIllustration from './AuthIllustration';
 
@@ -11,7 +10,7 @@ const AuthFormWrapper = ({ children }) => {
                 </div>
             </div>
 
-            <div className="w-full md:w-1/2 lg:w-3/5 xl:w-2/3 h-64 md:h-screen flex justify-center items-center bg-gradient-to-br from-muted/30 to-background p-8 order-1 md:order-2">
+            <div className="hidden md:flex w-full md:w-1/2 lg:w-3/5 xl:w-2/3 h-64 md:h-screen justify-center items-center bg-gradient-to-br from-muted/30 to-background p-8 order-1 md:order-2">
                 <AuthIllustration className="w-full max-w-xl h-auto text-primary opacity-80" />
             </div>
         </div>
