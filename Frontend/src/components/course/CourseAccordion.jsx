@@ -1,5 +1,3 @@
-// FRONTEND/src/components/course/CourseAccordion.jsx
-// Updated: Displays duration in seconds only
 import React, { useState } from "react";
 import { ChevronDown, PlayCircle, FileText, Lock, Edit, Trash2 } from "lucide-react";
 import Button from "../common/Button";
@@ -16,12 +14,10 @@ const CourseAccordion = ({ lessons, isCreatorView = false, onEditLesson, onDelet
         [lessons]
     );
 
-    // --- UPDATED: Format duration to show only seconds ---
     const formatDurationInSeconds = (seconds) => {
         if (seconds === undefined || seconds === null || isNaN(seconds) || seconds <= 0) return null;
-        return `${Math.round(seconds)}s`; // Show only seconds
+        return `${Math.round(seconds)}s`;
     };
-    // --- END UPDATE ---
 
     return (
         <div className="w-full space-y-2">
@@ -38,7 +34,6 @@ const CourseAccordion = ({ lessons, isCreatorView = false, onEditLesson, onDelet
                             <span className="text-sm font-normal text-muted-foreground w-6 text-right flex-shrink-0 pt-0.5">{index + 1}.</span>
                             <span className="flex-1">
                                 <span className="block truncate">{lesson.lesson_title || "Untitled Lesson"}</span>
-                                {/* Use updated duration format */}
                                 {formatDurationInSeconds(lesson.duration) && (
                                     <span className="block text-xs text-muted-foreground/80 mt-0.5">{formatDurationInSeconds(lesson.duration)}</span>
                                 )}

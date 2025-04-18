@@ -1,14 +1,13 @@
-// Updated
 import React, { useState, useEffect, useMemo } from "react";
 import { Search } from "lucide-react";
-import { fetchExploreCourses } from "../../services/api"; // Correct API function
+import { fetchExploreCourses } from "../../services/api";
 import CourseCard from "../../components/course/CourseCard";
 import LoadingSpinner from "../../components/common/LoadingSpinner";
-import PageLoader from "../../components/common/PageLoader"; // Use PageLoader for initial load
+import PageLoader from "../../components/common/PageLoader";
 import { useToast } from "../../hooks/useToast";
 import Input from "../../components/common/Input";
 
-const NAVIGATION_LINK = "explore"; // For navigating to detail page
+const NAVIGATION_LINK = "explore";
 
 const ExplorePage = () => {
     const [courses, setCourses] = useState([]);
@@ -17,15 +16,12 @@ const ExplorePage = () => {
     const [error, setError] = useState(null);
     const { error: showErrorToast } = useToast();
 
-    // Fetch courses on component mount
     useEffect(() => {
         const loadCourses = async () => {
             setLoading(true);
             setError(null);
             try {
-                // fetchExploreCourses requires a logged-in user (token handled by api service)
                 const data = await fetchExploreCourses();
-                // Backend returns { courses: [...] } in the 'data' field
                 setCourses(data.courses || []);
             } catch (err) {
                 console.error("Error fetching explore courses:", err);
@@ -38,8 +34,7 @@ const ExplorePage = () => {
         };
 
         loadCourses();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []); // Empty dependency array means run once on mount
+    }, []);
 
     const filteredCourses = useMemo(() => {
         if (!searchQuery) return courses;
@@ -82,7 +77,7 @@ const ExplorePage = () => {
                                 <CourseCard
                                     key={course.course_id}
                                     course={course}
-                                    navigationLink={NAVIGATION_LINK}
+                                    viewType="explore"
                                 />
                             ))}
                         </div>

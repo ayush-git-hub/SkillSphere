@@ -1,5 +1,3 @@
-// src/components/course/CourseReviews.jsx
-// Updated to use correct image field name
 import React, { useState, useEffect } from 'react';
 import { StarRatingDisplay } from './StarRating';
 import LoadingSpinner from '../common/LoadingSpinner';
@@ -49,17 +47,16 @@ const CourseReviews = ({ courseId }) => {
                     reviews.map((review) => (
                         <div key={review.review_id} className="card p-4 flex gap-4">
                             <div className="mt-1">
-                                {/* Use profile_image_original_url (thumbnail removed from backend) */}
                                 <div className="w-9 h-9 rounded-full bg-secondary text-secondary-foreground flex items-center justify-center text-sm font-medium uppercase flex-shrink-0 overflow-hidden border border-border">
                                     {review.user_profile_image_original_url ? (
                                         <img
                                             src={review.user_profile_image_original_url}
                                             alt={review.user_name || "User"}
                                             className="w-full h-full object-cover"
-                                            onError={(e) => { e.target.style.display = 'none'; e.target.parentElement.innerHTML = review.user_name?.charAt(0) || '<svg class="h-4 w-4"><use xlink:href="#user-icon"></use></svg>'; }} // Fallback within div
+                                            onError={(e) => { e.target.style.display = 'none'; e.target.parentElement.innerHTML = review.user_name?.charAt(0) || '<svg class="h-4 w-4"><use xlink:href="#user-icon"></use></svg>'; }}
                                         />
                                     ) : (
-                                        review.user_name?.charAt(0) || <UserIcon size={16} id="user-icon" /> // Fallback initial or icon
+                                        review.user_name?.charAt(0) || <UserIcon size={16} id="user-icon" />
                                     )}
                                 </div>
                             </div>

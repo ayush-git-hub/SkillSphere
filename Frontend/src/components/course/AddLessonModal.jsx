@@ -1,5 +1,3 @@
-// FRONTEND/src/components/course/AddLessonModal.jsx
-// New Component (renamed from AddLessonForm, logic moved here)
 import React, { useState } from "react";
 import { addLesson } from "../../services/api";
 import { useToast } from "../../hooks/useToast";
@@ -7,7 +5,6 @@ import { UploadCloud, FileText, X as CloseIcon } from "lucide-react";
 import Input from "../common/Input";
 import Button from "../common/Button";
 
-// Receives courseId, closeModalFunc, onLessonAdded
 const AddLessonModal = ({ courseId, closeModalFunc, onLessonAdded }) => {
     const initialLessonState = {
         lesson_title: "",
@@ -29,8 +26,8 @@ const AddLessonModal = ({ courseId, closeModalFunc, onLessonAdded }) => {
     const handleFileChange = (e) => {
         const { name, files } = e.target;
         const file = files[0];
-        const maxSizeVideo = 500 * 1024 * 1024; // 500MB
-        const maxSizeAssignment = 50 * 1024 * 1024; // 50MB
+        const maxSizeVideo = 500 * 1024 * 1024;
+        const maxSizeAssignment = 50 * 1024 * 1024;
 
         if (file) {
             if (name === 'lesson_video' && file.size > maxSizeVideo) {
@@ -70,15 +67,14 @@ const AddLessonModal = ({ courseId, closeModalFunc, onLessonAdded }) => {
 
         try {
             await addLesson(courseId, formData);
-            onLessonAdded(); // Notify parent (shows success toast & refetches)
-            closeModalFunc(); // Close the modal on success
+            onLessonAdded();
+            closeModalFunc();
 
         } catch (error) {
             console.error("Add lesson error:", error);
             showErrorToast(error.message || "Failed to add lesson. Please try again.");
-            setLoading(false); // Keep modal open on error
+            setLoading(false);
         }
-        // setLoading(false) is handled by parent via onLessonAdded in success case
     };
 
     return (
@@ -113,7 +109,6 @@ const AddLessonModal = ({ courseId, closeModalFunc, onLessonAdded }) => {
                         />
                     </div>
 
-                    {/* Video Upload */}
                     <div className="space-y-1">
                         <label className="block text-sm font-medium text-foreground">Upload Lesson Video (Optional)</label>
                         <div className="relative border-2 border-dashed border-border rounded-lg p-4 text-center transition-colors hover:border-muted-foreground">
@@ -134,7 +129,6 @@ const AddLessonModal = ({ courseId, closeModalFunc, onLessonAdded }) => {
                         </div>
                     </div>
 
-                    {/* Assignment Upload */}
                     <div className="space-y-1">
                         <label className="block text-sm font-medium text-foreground">Upload Assignment/Resources (Optional)</label>
                         <div className="relative border-2 border-dashed border-border rounded-lg p-4 text-center transition-colors hover:border-muted-foreground">

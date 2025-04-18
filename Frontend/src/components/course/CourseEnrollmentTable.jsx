@@ -1,13 +1,13 @@
-// FRONTEND/src/components/course/CourseEnrollmentTable.jsx
-// New Component
 import React from 'react';
-import { StarRatingDisplay } from './StarRating'; // Import display rating
-import { UserCircle } from 'lucide-react'; // Icon for missing review
+import { Link } from 'react-router-dom';
+import { StarRatingDisplay } from './StarRating';
+import { UserCircle } from 'lucide-react';
 
 const CourseEnrollmentTable = ({ enrollmentData }) => {
 
-    if (!enrollmentData || !enrollmentData.enrollments) {
-        return <p className="text-muted-foreground text-center py-4">No enrollment data available.</p>;
+    if (!enrollmentData || !Array.isArray(enrollmentData.enrollments)) {
+        const message = enrollmentData?.message || "No enrollment data available or data is invalid.";
+        return <p className="text-muted-foreground text-center py-4">{message}</p>;
     }
 
     const {
@@ -26,32 +26,30 @@ const CourseEnrollmentTable = ({ enrollmentData }) => {
         let timeString = '';
         if (hrs > 0) timeString += `${hrs}h `;
         if (mins > 0) timeString += `${mins}m `;
-        if (secs > 0 || timeString === '') timeString += `${secs}s`; // Show seconds if needed or if total time is < 1 min
+        if (secs > 0 || timeString === '') timeString += `${secs}s`;
         return timeString.trim();
     };
 
     return (
         <div className="w-full space-y-6">
-            {/* Summary Stats */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="card p-4 text-center">
+                <div className="card p-4 text-center border border-border">
                     <p className="text-xs uppercase text-muted-foreground font-semibold tracking-wider">Total Users</p>
                     <p className="text-2xl font-bold text-foreground mt-1">{total_enrolled_users}</p>
                 </div>
-                <div className="card p-4 text-center">
+                <div className="card p-4 text-center border border-border">
                     <p className="text-xs uppercase text-muted-foreground font-semibold tracking-wider">Average Rating</p>
                     <div className="flex items-center justify-center gap-1 mt-1">
                         <span className="text-2xl font-bold text-foreground">{average_course_rating > 0 ? average_course_rating.toFixed(1) : '-'}</span>
                         {average_course_rating > 0 && <StarRatingDisplay rating={average_course_rating} size="sm" className="mt-1" />}
                     </div>
                 </div>
-                <div className="card p-4 text-center">
+                <div className="card p-4 text-center border border-border">
                     <p className="text-xs uppercase text-muted-foreground font-semibold tracking-wider">Total Income</p>
                     <p className="text-2xl font-bold text-foreground mt-1">₹{total_income.toFixed(2)}</p>
                 </div>
             </div>
 
-            {/* Enrollments Table */}
             <div className="card overflow-hidden border border-border">
                 <div className="overflow-x-auto">
                     <table className="min-w-full divide-y divide-border">
@@ -73,7 +71,12 @@ const CourseEnrollmentTable = ({ enrollmentData }) => {
                                 enrollments.map((enrollment) => (
                                     <tr key={enrollment.user_id} className="hover:bg-muted/30 transition-colors">
                                         <td className="px-4 py-3 whitespace-nowrap">
-                                            <div className="text-sm font-medium text-foreground">{enrollment.name}</div>
+                                            <Link
+                                                to={`/author/${enrollment.user_id}`}
+                                                className="text-sm font-medium text-primary hover:underline focus:outline-none focus-visible:ring-1 focus-visible:ring-ring rounded" // Link styling
+                                            >
+                                                {enrollment.name || 'Unknown User'}
+                                            </Link>
                                             <div className="text-xs text-muted-foreground">{enrollment.email}</div>
                                         </td>
                                         <td className="px-4 py-3 whitespace-nowrap text-sm text-foreground">

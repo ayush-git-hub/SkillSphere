@@ -1,5 +1,3 @@
-// src/components/course/ReviewForm.jsx
-// Updated to use correct image field name
 import React, { useEffect, useState } from 'react';
 import StarRating, { StarRatingDisplay } from './StarRating';
 import { fetchMyReviewForCourse, addOrUpdateReview } from "../../services/api";
@@ -37,7 +35,7 @@ const ReviewForm = ({ userId, courseId }) => {
             } finally { setLoadingReview(false); }
         };
         loadReview();
-    }, [courseId, userId, showErrorToast]); // Added showErrorToast dependency
+    }, [courseId, userId, showErrorToast]);
 
     const handleRatingChange = (newRating) => {
         setReviewForm((prev) => ({ ...prev, rating: newRating }));
@@ -55,7 +53,7 @@ const ReviewForm = ({ userId, courseId }) => {
             const reviewData = { rating: reviewForm.rating, comment: reviewForm.comment.trim() };
             const response = await addOrUpdateReview(courseId, reviewData);
             showSuccessToast(existingReview ? "Review updated successfully!" : "Review submitted successfully!");
-            setExistingReview(response.review); // Update local state with returned review
+            setExistingReview(response.review);
         } catch (error) {
             console.error("Submit/Update review error:", error);
             showErrorToast(error.message || "Failed to submit review.");
@@ -81,7 +79,7 @@ const ReviewForm = ({ userId, courseId }) => {
                         <div className="mb-4 border-b border-border pb-4">
                             <div className="flex items-center justify-between mb-2">
                                 <StarRatingDisplay rating={existingReview.rating} size="md" />
-                                <span className='text-sm text-muted-foreground'>{formatDate(existingReview.review_date)}</span>
+                                <span className='text-sm text-muted-foreground'>{`${formatDate(existingReview.review_date)} (Last Update)`}</span>
                             </div>
                             <p className="text-muted-foreground whitespace-pre-wrap">{existingReview.comment || <i>No comment provided.</i>}</p>
                             <p className="text-xs text-primary mt-3">You can update your review below.</p>

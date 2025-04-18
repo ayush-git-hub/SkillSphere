@@ -1,5 +1,5 @@
 from app.extensions import db
-from app.services.minio_service import get_presigned_url # Import service function
+from app.services.minio_service import get_presigned_url 
 
 class Lesson(db.Model):
     __tablename__ = 'lessons'
@@ -29,7 +29,6 @@ class Lesson(db.Model):
             'lesson_id': self.lesson_id,
             'lesson_title': self.lesson_title,
             'lesson_description': self.lesson_description,
-            # 'lesson_order': self.lesson_order, # REMOVED
             'duration': self.duration,
             'course_id': self.course_id
         }

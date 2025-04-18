@@ -4,18 +4,14 @@ const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
     const [theme, setTheme] = useState(() => {
-        // Get theme from local storage or default to 'dark'
         const savedTheme = localStorage.getItem('theme');
         return savedTheme || 'dark';
     });
 
     useEffect(() => {
-        // Apply theme class to HTML element
         const root = window.document.documentElement;
         root.classList.remove(theme === 'light' ? 'dark' : 'light');
         root.classList.add(theme);
-
-        // Save theme to local storage
         localStorage.setItem('theme', theme);
     }, [theme]);
 
@@ -30,7 +26,6 @@ export const ThemeProvider = ({ children }) => {
     );
 };
 
-// Custom hook to use the theme context
 export const useTheme = () => {
     const context = useContext(ThemeContext);
     if (context === undefined) {

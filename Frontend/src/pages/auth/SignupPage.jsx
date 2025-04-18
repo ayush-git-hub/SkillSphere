@@ -1,5 +1,3 @@
-// src/pages/auth/SignupPage.jsx
-// Updated to use correct backend image field name
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Mail, Lock, User as UserIcon, Image as ImageIcon } from "lucide-react";
@@ -25,7 +23,7 @@ const SignupPage = () => {
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (file && file.type.startsWith('image/')) {
-            if (file.size > 2 * 1024 * 1024) { // 2MB limit
+            if (file.size > 2 * 1024 * 1024) {
                 showErrorToast("Profile image size cannot exceed 2MB.");
                 setProfileImage(null); setImagePreview(null); e.target.value = ''; return;
             }
@@ -50,7 +48,6 @@ const SignupPage = () => {
         submissionData.append('email', formData.email);
         submissionData.append('password', formData.password);
         if (profileImage) {
-            // Backend expects 'profile_image' (singular)
             submissionData.append('profile_image', profileImage);
         }
 

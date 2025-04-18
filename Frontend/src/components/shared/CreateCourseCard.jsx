@@ -3,7 +3,7 @@ import { Plus } from "lucide-react";
 
 const CreateCourseCard = ({ onClick }) => {
     return (
-        <button // Use a button for better accessibility
+        <button
             className="card border-2 border-dashed border-border hover:border-primary/50 bg-transparent hover:bg-accent/30 rounded-lg w-full aspect-video sm:aspect-auto sm:min-h-[350px] flex items-center justify-center transition-all duration-300 group focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background p-4" // Use card, responsive height
             onClick={onClick}
             aria-label="Create New Course"

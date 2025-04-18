@@ -19,5 +19,5 @@ app = create_app(config_name)
 
 if __name__ == "__main__":
     # Use host='0.0.0.0' to make it accessible externally (e.g., from Docker)
-    port = int(os.environ.get("PORT", 8000)) # Use PORT env var if set, else default
+    port = int(os.environ.get("PORT", 8000)) 
     app.run(host='0.0.0.0', port=port)

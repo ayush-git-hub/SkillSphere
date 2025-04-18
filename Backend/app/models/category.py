@@ -8,7 +8,7 @@ class Category(db.Model):
     category_description = db.Column(db.Text, nullable=True)
 
     # One-to-Many: Category to Course
-    courses = db.relationship("Course", back_populates='category', lazy='dynamic') # Use lazy='dynamic' for querying
+    courses = db.relationship("Course", back_populates='category', lazy='dynamic') 
 
     def __repr__(self):
         return f'<Category {self.category_name}>'

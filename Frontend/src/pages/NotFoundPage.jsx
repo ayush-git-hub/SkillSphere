@@ -1,20 +1,19 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { AlertTriangle } from 'lucide-react';
-import Button from '../components/common/Button'; // Use Button component
+import Button from '../components/common/Button';
 
 const NotFoundPage = () => {
     return (
-        // Center content vertically and horizontally within the main content area
-        <div className="flex flex-col items-center justify-center text-center min-h-[calc(100vh-10rem)] px-4"> {/* Adjust min-height accounting for nav/padding */}
+        <div className="flex flex-col items-center justify-center text-center min-h-[calc(100vh-10rem)] px-4">
             <AlertTriangle className="w-16 h-16 text-destructive mb-6" />
             <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-3">404 - Page Not Found</h1>
             <p className="text-base md:text-lg text-muted-foreground mb-8 max-w-md">
                 Oops! The page you are looking for doesn't exist or has been moved.
             </p>
             <Button
-                as={Link} // Render as a Link component
-                to="/explore" // Link to a safe default page
+                as={Link}
+                to="/explore"
                 variant="primary"
                 size="lg"
             >

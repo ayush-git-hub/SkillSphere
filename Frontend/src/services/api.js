@@ -1,19 +1,15 @@
-// FRONTEND/src/services/api.js
 import axios from 'axios';
-import { API_BASE_URL } from '../config/apiConfig'; // Your API base URL config
+import { API_BASE_URL } from '../config/apiConfig';
 
-// Function to get the token from local storage
 const getAuthToken = () => localStorage.getItem('authToken');
 
-// Create an Axios instance with default headers
 const apiClient = axios.create({
-    baseURL: API_BASE_URL, // Should be 'http://localhost:8000/api' or similar
+    baseURL: API_BASE_URL,
     headers: {
         'Content-Type': 'application/json',
     },
 });
 
-// Add a request interceptor to include the token dynamically
 apiClient.interceptors.request.use(
     (config) => {
         const token = getAuthToken();
@@ -30,19 +26,13 @@ apiClient.interceptors.request.use(
     }
 );
 
-// Helper function to handle API responses and errors
 const handleResponse = (response) => {
-    // Check if the response has data and a success flag
     if (response.data && response.data.success) {
-        // Return the nested 'data' field on success
-        // This is the crucial part for consistency
         return response.data.data;
     } else {
-        // Handle cases where success is false or structure is unexpected
         const message = response.data?.message || 'An unknown error occurred';
         const error = new Error(message);
         error.status = response.status;
-        // Include backend data if available
         if (response.data) {
             error.data = response.data;
         }
@@ -66,20 +56,16 @@ const handleError = (error) => {
     }
 };
 
-// --- Authentication ---
 export const signinUser = async (credentials) => {
     try {
         const response = await apiClient.post('/auth/login', credentials);
-        // *** USE handleResponse HERE ***
-        // Now it will return the nested { token: '...', user: {...} } object
         return handleResponse(response);
     } catch (error) {
-        // handleError will catch issues thrown by handleResponse or network errors
         handleError(error);
     }
 };
 
-export const signupUser = async (formData) => { // Expects FormData
+export const signupUser = async (formData) => {
     try {
         const response = await apiClient.post('/auth/signup', formData);
         return handleResponse(response);
@@ -88,7 +74,6 @@ export const signupUser = async (formData) => { // Expects FormData
     }
 };
 
-// --- User ---
 export const fetchUserProfile = async () => {
     try {
         const response = await apiClient.get('/users/profile');
@@ -122,7 +107,6 @@ export const fetchUserDetails = async (userId) => {
     }
 };
 
-// --- Categories ---
 export const fetchCategories = async () => {
     try {
         const response = await apiClient.get('/general/categories');
@@ -132,7 +116,6 @@ export const fetchCategories = async () => {
     }
 };
 
-// --- Courses ---
 export const createCourse = async (formData) => {
     try {
         const response = await apiClient.post('/courses/', formData);
@@ -223,7 +206,6 @@ export const fetchCourseEnrollmentDetails = async (courseId) => {
     }
 };
 
-// --- Lessons ---
 export const addLesson = async (courseId, formData) => {
     try {
         const response = await apiClient.post(`/courses/${courseId}/lessons`, formData);
@@ -245,25 +227,12 @@ export const updateLesson = async (courseId, lessonId, formData) => {
 export const deleteLesson = async (courseId, lessonId) => {
     try {
         const response = await apiClient.delete(`/courses/${courseId}/lessons/${lessonId}`);
-        // Check if backend sends data on delete, handleResponse might need adjustment if not
-        // If delete returns only { success: true, message: '...' }, handleResponse might fail
-        // For now, assume it might return empty data or specific message
         return handleResponse(response);
     } catch (error) {
         handleError(error);
     }
 };
 
-export const markLessonComplete = async (courseId, lessonId) => {
-    try {
-        const response = await apiClient.post(`/courses/${courseId}/lessons/${lessonId}/complete`, {});
-        return handleResponse(response);
-    } catch (error) {
-        handleError(error);
-    }
-};
-
-// --- Reviews ---
 export const addOrUpdateReview = async (courseId, reviewData) => {
     try {
         const response = await apiClient.post(`/courses/${courseId}/review`, reviewData);
@@ -285,6 +254,21 @@ export const fetchMyReviewForCourse = async (courseId) => {
 export const fetchReviewsForCourse = async (courseId) => {
     try {
         const response = await apiClient.get(`/courses/${courseId}/reviews`);
+        return handleResponse(response);
+    } catch (error) {
+        handleError(error);
+    }
+};
+
+export const markLessonComplete = async (courseId, lessonId, timeSpentIncrement = null) => {
+    try {
+        const payload = {};
+        if (timeSpentIncrement !== null && typeof timeSpentIncrement === 'number' && timeSpentIncrement >= 0) {
+            payload.timeSpentIncrement = Math.round(timeSpentIncrement); // Send integer seconds
+        } else {
+        }
+        const config = { headers: { 'Content-Type': 'application/json' } };
+        const response = await apiClient.post(`/courses/${courseId}/lessons/${lessonId}/complete`, payload, config);
         return handleResponse(response);
     } catch (error) {
         handleError(error);

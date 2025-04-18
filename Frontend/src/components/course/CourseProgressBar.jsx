@@ -1,11 +1,8 @@
-// FRONTEND/src/components/course/CourseProgressBar.jsx
-// New component for displaying progress visually
 import React from 'react';
 
 const CourseProgressBar = ({ completed, total }) => {
     const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
 
-    // Determine color based on completion
     const barColorClass = percentage === 100 ? 'bg-green-500' : 'bg-primary';
 
     return (

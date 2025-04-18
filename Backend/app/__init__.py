@@ -1,56 +1,3 @@
-# import os
-# from flask import Flask
-# from flask_cors import CORS
-
-# from .config import config_by_name
-# from .extensions import db, bcrypt
-# from .services.minio_service import initialize_minio # Import minio initializer
-# from .models import User, Course, Category, Lesson, Enrollment, Payment, Review
-
-# def create_app(config_name=None):
-#     """Application Factory Function"""
-#     if config_name is None:
-#         config_name = os.getenv('FLASK_ENV', 'default')
-
-#     app = Flask(__name__)
-#     app.config.from_object(config_by_name[config_name])
-
-#     # Initialize extensions
-#     db.init_app(app)
-#     bcrypt.init_app(app)
-#     CORS(app) # Enable CORS for all routes, configure origins in production
-
-#     with app.app_context():
-#         # Create database tables if they don't exist
-#         # In production, use migrations (Flask-Migrate) instead of create_all
-#         db.create_all()
-
-#         # Initialize MinIO client after app context and config are ready
-#         initialize_minio()
-
-#         # Import and register blueprints
-#         from .routes import auth_bp, users_bp, courses_bp, general_bp
-#         # Adjust URL prefixes if needed
-#         app.register_blueprint(auth_bp, url_prefix='/api/auth')
-#         app.register_blueprint(users_bp, url_prefix='/api/users')
-#         app.register_blueprint(courses_bp, url_prefix='/api/courses')
-#         app.register_blueprint(general_bp, url_prefix='/api/general') # For categories, media serving etc.
-
-#         # Optional: Add a simple health check endpoint
-#         @app.route('/health')
-#         def health_check():
-#             return "OK", 200
-
-#     # Configure logging (optional, Flask has basic logging)
-#     # import logging
-#     # if not app.debug:
-#     #     # Configure production logging (e.g., RotatingFileHandler)
-#     #     pass
-
-#     return app
-
-# BACKEND/app/__init__.py
-
 import os
 from flask import Flask
 from flask_cors import CORS
@@ -58,7 +5,7 @@ from flask_cors import CORS
 # Import configurations and extensions
 from .config import config_by_name
 from .extensions import db, bcrypt
-from .services.minio_service import initialize_minio # Import minio initializer
+from .services.minio_service import initialize_minio 
 
 # Import models to ensure they are known to SQLAlchemy before create_all
 # Although not strictly necessary for create_all if they are imported elsewhere
@@ -142,17 +89,6 @@ def create_app(config_name=None):
 
     # Configure logging further if needed (Flask provides basic logging)
     if not app.debug and not app.testing:
-        # Example: Configure more robust logging for production
-        # import logging
-        # from logging.handlers import RotatingFileHandler
-        # file_handler = RotatingFileHandler('logs/app.log', maxBytes=10240, backupCount=10)
-        # file_handler.setFormatter(logging.Formatter(
-        #     '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
-        # ))
-        # file_handler.setLevel(logging.INFO)
-        # app.logger.addHandler(file_handler)
-        # app.logger.setLevel(logging.INFO)
-        # app.logger.info('Application startup')
         pass # Placeholder for production logging config
 
 

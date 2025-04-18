@@ -1,11 +1,9 @@
-// FRONTEND/src/pages/course/ExploreDetailPage.jsx
-// Updated: Author Card Click, Course Card Click logic
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
     fetchExploreCourseDetail,
     enrollInCourse,
-    fetchEnrolledCourses, // Needed to check enrollment for author's courses
+    fetchEnrolledCourses,
     fetchReviewsForCourse
 } from "../../services/api";
 import CourseDetailCard from "../../components/course/CourseDetailCard";
@@ -16,13 +14,13 @@ import CourseDetailDescription from "../../components/course/CourseDetailDescrip
 import AboutInstructor from "../../components/course/AboutInstructor";
 import CourseReviews from "../../components/course/CourseReviews";
 import NotFoundPage from "../NotFoundPage";
-import { useAuthContext } from '../../contexts/AuthContext'; // Import Auth context
+import { useAuthContext } from '../../contexts/AuthContext';
 
 const ExploreDetailPage = () => {
     const { courseId } = useParams();
     const navigate = useNavigate();
     const { success: showSuccessToast, error: showErrorToast } = useToast();
-    const { user, isAuthenticated } = useAuthContext(); // Get user and auth status
+    const { user, isAuthenticated } = useAuthContext();
     const userId = user?.user_id;
 
     const [course, setCourse] = useState(null);
@@ -32,21 +30,19 @@ const ExploreDetailPage = () => {
     const [loading, setLoading] = useState(true);
     const [enrollLoading, setEnrollLoading] = useState(false);
     const [isAlreadyEnrolled, setIsAlreadyEnrolled] = useState(false);
-    const [enrolledCourseIds, setEnrolledCourseIds] = useState(new Set()); // Store IDs of user's enrolled courses
+    const [enrolledCourseIds, setEnrolledCourseIds] = useState(new Set());
     const [error, setError] = useState(null);
 
-    // Check if current user is enrolled in *this* course
     const checkEnrollment = useCallback(async () => {
         if (!userId || !courseId) return false;
         try {
-            const enrolledData = await fetchEnrolledCourses(); // Fetch all enrolled courses
+            const enrolledData = await fetchEnrolledCourses();
             const enrolledList = enrolledData.courses || [];
             const enrolledIdsSet = new Set(enrolledList.map(c => c.course_id));
-            setEnrolledCourseIds(enrolledIdsSet); // Store the set for later use (author profile)
-            return enrolledIdsSet.has(parseInt(courseId, 10)); // Check for *this* course
+            setEnrolledCourseIds(enrolledIdsSet);
+            return enrolledIdsSet.has(parseInt(courseId, 10));
         } catch (err) {
             console.error("Failed to check enrollment status:", err);
-            // Don't block loading if this fails, assume not enrolled
             setEnrolledCourseIds(new Set());
             return false;
         }
@@ -70,7 +66,6 @@ const ExploreDetailPage = () => {
                     setAverageRating(null); console.warn("Could not fetch reviews for rating:", reviewError);
                 }
 
-                // Check enrollment *after* fetching course data, only if logged in
                 if (isAuthenticated) {
                     const enrolled = await checkEnrollment();
                     setIsAlreadyEnrolled(enrolled);
@@ -89,7 +84,7 @@ const ExploreDetailPage = () => {
             }
             setCourse(null); setLessons([]); setCreator(null); setAverageRating(null);
         } finally { setLoading(false); }
-    }, [courseId, showErrorToast, checkEnrollment, isAuthenticated]); // Add isAuthenticated dependency
+    }, [courseId, showErrorToast, checkEnrollment, isAuthenticated]);
 
     useEffect(() => { loadData(); }, [loadData]);
 
@@ -105,7 +100,7 @@ const ExploreDetailPage = () => {
             await enrollInCourse(course.course_id);
             showSuccessToast("Enrollment successful! Redirecting...");
             setIsAlreadyEnrolled(true);
-            setEnrolledCourseIds(prev => new Set(prev).add(course.course_id)); // Add to local set
+            setEnrolledCourseIds(prev => new Set(prev).add(course.course_id));
             setTimeout(() => navigate(`/enrolled-course/${course.course_id}`), 1500);
         } catch (err) {
             console.error("Enrollment error:", err);
@@ -118,32 +113,26 @@ const ExploreDetailPage = () => {
         }
     };
 
-    // --- Author Card Click Handler ---
     const handleAuthorClick = () => {
         if (creator?.user_id) {
-            // Navigate to a new Author Profile Page (you'll need to create this page and route)
-            // This page will use the new `/users/{user_id}/details` backend route
             navigate(`/author/${creator.user_id}`);
         } else {
             console.warn("Cannot navigate to author profile: Creator ID missing.");
         }
     };
-    // --- End Author Card Click Handler ---
-
 
     if (loading) return <PageLoader message="Loading Course Details..." />;
     if (error === "Course not found.") return <NotFoundPage />;
     if (error) return <div className="container py-10 text-center text-destructive">{error}</div>;
     if (!course) return <NotFoundPage />;
 
-    // Determine if the current user is the creator
     const isCreator = isAuthenticated && creator && creator.user_id === userId;
 
     return (
         <div className="space-y-10">
             <CourseDetailCard
                 course={course}
-                enrollButtonEnable={!isAlreadyEnrolled && !isCreator} // Enable only if not enrolled AND not creator
+                enrollButtonEnable={!isAlreadyEnrolled && !isCreator}
                 onEnrollClick={handleEnroll}
                 isEnrolling={enrollLoading}
                 isEnrolled={isAlreadyEnrolled}
@@ -153,12 +142,11 @@ const ExploreDetailPage = () => {
             {course.course_description && <CourseDetailDescription description={course.course_description} />}
             {lessons.length > 0 && <CourseLessonList lessons={lessons} isLockedPreview={true} />}
 
-            {/* Wrap AboutInstructor in a clickable div */}
             {creator && (
                 <div
                     onClick={handleAuthorClick}
-                    role="button" // Make it behave like a button
-                    tabIndex={0} // Make it focusable
+                    role="button"
+                    tabIndex={0}
                     onKeyPress={(e) => (e.key === 'Enter' || e.key === ' ') && handleAuthorClick()}
                     className="cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-md transition-shadow hover:shadow-md"
                     aria-label={`View profile and courses by ${creator.name}`}

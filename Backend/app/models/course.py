@@ -1,8 +1,7 @@
-# BACKEND/app/models/course.py
 from datetime import datetime
 from app.extensions import db
 from flask import current_app
-from sqlalchemy import func # Import func for calculations
+from sqlalchemy import func 
 
 class Course(db.Model):
     __tablename__ = 'courses'
@@ -13,9 +12,9 @@ class Course(db.Model):
     price = db.Column(db.Float, nullable=False, default=0.0)
     date_of_creation = db.Column(db.DateTime, default=datetime.utcnow)
     updated_date = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    thumbnail_filename = db.Column(db.String(500), nullable=True) # Store filename, not URL
+    thumbnail_filename = db.Column(db.String(500), nullable=True) 
     difficulty_level = db.Column(db.String(50), nullable=False)
-    estimated_duration = db.Column(db.Integer, nullable=True, default=0) # Total seconds from lessons
+    estimated_duration = db.Column(db.Integer, nullable=True, default=0) 
     language = db.Column(db.String(50), nullable=False)
 
     # Foreign Keys

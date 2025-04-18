@@ -1,22 +1,21 @@
-# BACKEND/app/routes/courses.py
 import os
 import uuid
 from flask import request, g, current_app
 from werkzeug.utils import secure_filename
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
-from sqlalchemy import func, desc # Import func and desc
+from sqlalchemy import func, desc 
 from datetime import datetime
 
 from app.extensions import db
-from app.models import Course, Lesson, Category, Enrollment, Review, User, Payment # Import necessary models
+from app.models import Course, Lesson, Category, Enrollment, Review, User, Payment 
 from app.utils.responses import success_response, error_response
 from app.utils.image_processor import save_course_thumbnail
 from app.services.minio_service import (
     upload_file_to_minio,
     get_video_duration,
     get_presigned_url,
-    delete_file_from_minio # Import delete function
+    delete_file_from_minio 
 )
 from app.middleware.auth_middleware import token_required
 from . import courses_bp
@@ -79,7 +78,6 @@ def handle_minio_upload(file_storage, base_path, content_type):
         # data = file_storage.stream.read()
         # file_storage.stream = io.BytesIO(data)
 
-
     uploaded_name = upload_file_to_minio(
         file_stream=file_storage.stream, # Pass the stream directly
         object_name=unique_filename,
@@ -92,7 +90,8 @@ def handle_minio_upload(file_storage, base_path, content_type):
     return uploaded_name, None
 
 
-# --- Course Creation ---
+
+
 @courses_bp.route("/", methods=["POST"])
 @token_required
 def create_new_course():
@@ -115,12 +114,10 @@ def create_new_course():
     except ValueError:
         return error_response("Invalid price format.", 400)
 
-    # --- Thumbnail Processing ---
     thumbnail_filename = save_course_thumbnail(thumbnail_image)
     if not thumbnail_filename:
         return error_response("Failed to process course thumbnail image.", 400)
 
-    # --- Get or Create Category ---
     category_name = data['category_name'].strip()
     category, error = get_or_create_category(category_name)
     if error:
@@ -129,7 +126,6 @@ def create_new_course():
         except OSError: pass
         return error_response(error, 400 if "empty" in error else 500)
 
-    # --- Create Course ---
     try:
         new_course = Course(
             course_title=data['course_title'],
@@ -164,7 +160,8 @@ def create_new_course():
         return error_response("An unexpected error occurred.", 500)
 
 
-# --- Update Course ---
+
+
 @courses_bp.route("/<int:course_id>", methods=["PUT"])
 @token_required
 def update_course(course_id):
@@ -259,17 +256,20 @@ def update_course(course_id):
         return error_response("An unexpected error occurred while updating the course.", 500)
 
 
-# --- Get Created Courses ---
+
+
 @courses_bp.route("/created", methods=["GET"])
 @token_required
 def get_created_courses():
     """Get all courses created by the logged-in user"""
     current_user = g.current_user
     courses = Course.query.filter_by(creator_id=current_user.user_id).order_by(Course.updated_date.desc()).all()
-    courses_list = [course.to_dict(include_category=True) for course in courses]
+    courses_list = [course.to_dict(include_category=True, include_creator=True, include_stats=True) for course in courses]
     return success_response("Fetched created courses successfully.", data={'courses': courses_list})
 
-# --- Get Created Course Detail (for Management) ---
+
+
+
 @courses_bp.route("/<int:course_id>/manage", methods=["GET"])
 @token_required
 def get_created_course_detail_for_manage(course_id):
@@ -291,7 +291,8 @@ def get_created_course_detail_for_manage(course_id):
     )
 
 
-# --- Add Lesson ---
+
+
 @courses_bp.route("/<int:course_id>/lessons", methods=["POST"])
 @token_required
 def add_lesson_to_course(course_id):
@@ -362,7 +363,8 @@ def add_lesson_to_course(course_id):
         return error_response("An unexpected error occurred while adding the lesson.", 500)
 
 
-# --- Update Lesson ---
+
+
 @courses_bp.route("/<int:course_id>/lessons/<int:lesson_id>", methods=["PUT"])
 @token_required
 def update_lesson(course_id, lesson_id):
@@ -453,7 +455,8 @@ def update_lesson(course_id, lesson_id):
         return error_response("An unexpected error occurred while updating the lesson.", 500)
 
 
-# --- Delete Lesson ---
+
+
 @courses_bp.route("/<int:course_id>/lessons/<int:lesson_id>", methods=["DELETE"])
 @token_required
 def delete_lesson(course_id, lesson_id):
@@ -492,7 +495,8 @@ def delete_lesson(course_id, lesson_id):
         return error_response("An unexpected error occurred while deleting the lesson.", 500)
 
 
-# --- Explore Courses ---
+
+
 @courses_bp.route("/explore", methods=["GET"])
 @token_required
 def explore_courses():
@@ -515,7 +519,8 @@ def explore_courses():
     return success_response("Fetched explore courses successfully.", data={'courses': courses_list})
 
 
-# --- Explore Course Detail ---
+
+
 @courses_bp.route("/<int:course_id>/explore-detail", methods=["GET"])
 # No token required here, public view
 def get_explore_course_detail(course_id):
@@ -541,7 +546,8 @@ def get_explore_course_detail(course_id):
     )
 
 
-# --- Enroll in Course ---
+
+
 @courses_bp.route("/<int:course_id>/enroll", methods=["POST"])
 @token_required
 def enroll_in_course(course_id):
@@ -609,7 +615,8 @@ def enroll_in_course(course_id):
         return error_response("An unexpected error occurred during enrollment.", 500)
 
 
-# --- Get Enrolled Courses ---
+
+
 @courses_bp.route("/enrolled", methods=["GET"])
 @token_required
 def get_enrolled_courses():
@@ -631,60 +638,24 @@ def get_enrolled_courses():
     return success_response("Fetched enrolled courses successfully.", data={'courses': enrolled_courses_list})
 
 
-# --- Get Enrolled Course Detail ---
-# @courses_bp.route("/<int:course_id>/enrolled-detail", methods=["GET"])
-# @token_required
-# def get_enrolled_course_detail(course_id):
-#     """Get full details of an enrolled course, including progress and lesson URLs"""
-#     current_user = g.current_user
 
-#     enrollment = Enrollment.query.options(
-#         joinedload(Enrollment.course).joinedload(Course.lessons), # Eager load lessons
-#         joinedload(Enrollment.course).joinedload(Course.category),
-#         joinedload(Enrollment.course).joinedload(Course.creator)
-#     ).filter_by(
-#         learner_id=current_user.user_id, course_id=course_id
-#     ).first_or_404(description="You are not enrolled in this course or it does not exist.")
 
-#     course = enrollment.course
-
-#     # Get lessons with generated presigned URLs (ordered by ID via relationship)
-#     lessons_data = [lesson.to_dict(generate_urls=True) for lesson in course.lessons]
-
-#     course_data = course.to_dict(include_category=True, include_creator=True, include_stats=True) # Include rating
-#     # Add the detailed enrollment info, including progress
-#     course_data['enrollment_details'] = enrollment.to_dict()
-
-#     return success_response(
-#         "Fetched enrolled course details.",
-#         data={
-#             "course": course_data,
-#             "lessons": lessons_data
-#         }
-#     )
 @courses_bp.route("/<int:course_id>/enrolled-detail", methods=["GET"])
 @token_required
 def get_enrolled_course_detail(course_id):
     """Get full details of an enrolled course, including progress and lesson URLs"""
     current_user = g.current_user
 
-    # --- CORRECTED QUERY ---
     # Remove the joinedload for Course.lessons
     enrollment = Enrollment.query.options(
-        # Eager load the course itself, its category, and its creator
         joinedload(Enrollment.course).joinedload(Course.category),
         joinedload(Enrollment.course).joinedload(Course.creator)
-        # REMOVED: joinedload(Enrollment.course).joinedload(Course.lessons)
     ).filter_by(
         learner_id=current_user.user_id, course_id=course_id
     ).first_or_404(description="You are not enrolled in this course or it does not exist.")
-    # --- END CORRECTION ---
 
     course = enrollment.course # Get the course object (category and creator are eager loaded)
 
-    # Get lessons with generated presigned URLs
-    # Accessing course.lessons here will trigger the lazy load (dynamic query)
-    # The order_by in the relationship definition still applies.
     lessons_data = [lesson.to_dict(generate_urls=True) for lesson in course.lessons]
 
     course_data = course.to_dict(include_category=True, include_creator=True, include_stats=True) # Include rating
@@ -699,12 +670,27 @@ def get_enrolled_course_detail(course_id):
         }
     )
 
-# --- NEW ROUTE: Mark Lesson as Completed ---
+
+
+
 @courses_bp.route("/<int:course_id>/lessons/<int:lesson_id>/complete", methods=["POST"])
 @token_required
 def mark_lesson_complete(course_id, lesson_id):
-    """Marks a specific lesson as completed for the enrolled user."""
+    """
+    Marks a specific lesson as completed for the enrolled user.
+    Optionally accepts 'timeSpentIncrement' (in seconds) in the JSON body
+    to add to the total time spent on the course.
+    """
     current_user = g.current_user
+    data = request.get_json() or {}  # Get JSON data, default to empty dict
+    # Get the time increment from the request, default to 0 if not provided or invalid
+    try:
+        time_increment_seconds = float(data.get('timeSpentIncrement', 0))
+        if time_increment_seconds < 0:
+            time_increment_seconds = 0 # Ignore negative values
+    except (ValueError, TypeError):
+        time_increment_seconds = 0
+        current_app.logger.warning(f"Invalid timeSpentIncrement received for lesson {lesson_id}, defaulting to 0.")
 
     # 1. Verify enrollment
     enrollment = Enrollment.query.filter_by(
@@ -718,49 +704,41 @@ def mark_lesson_complete(course_id, lesson_id):
     if not lesson:
         return error_response("Lesson not found in this course.", 404)
 
-    # 3. Update progress (simple increment - needs improvement for idempotency)
-    #    A more robust system would store completed lesson IDs in a separate table or JSON field.
-    #    For simplicity, we increment, but this isn't safe if called multiple times.
-    #    Let's assume frontend prevents multiple calls for now.
-    #    A better approach: Check if lesson already marked complete before incrementing.
-
-    # --- Better Approach (Conceptual - requires schema change or different tracking) ---
-    # if lesson_id not in enrollment.completed_lesson_ids: # Assuming completed_lesson_ids is a list/set
-    #    enrollment.completed_lesson_ids.append(lesson_id)
-    #    enrollment.lessons_completed = len(enrollment.completed_lesson_ids)
-    #    # Update time spent? Needs mechanism.
-    #    # enrollment.time_spent_seconds += calculate_time_spent()
-    #    db.session.commit()
-    #    return success_response("Lesson progress updated.", data=enrollment.to_dict())
-    # else:
-    #    return success_response("Lesson already marked as complete.", data=enrollment.to_dict(), status_code=200)
-    # --- End Better Approach ---
-
-    # --- Simple Increment (Less Safe) ---
+    # 3. Update progress and time
+    #    Still using simple increment for progress count - needs improvement for idempotency
+    #    (e.g., using a separate completion tracking table/field).
     try:
-        # Ideally, check if already completed before incrementing
-        # For now, just increment, capped at total lessons
         total_lessons = enrollment.course.lessons.count()
+        progress_updated = False
         if enrollment.lessons_completed < total_lessons:
-             enrollment.lessons_completed += 1
-             # Add placeholder time update logic if needed
-             # enrollment.time_spent_seconds += lesson.duration or 60 # Add lesson duration or default
-             db.session.commit()
-             current_app.logger.info(f"Lesson {lesson_id} marked complete for user {current_user.user_id} in course {course_id}. Progress: {enrollment.lessons_completed}/{total_lessons}")
-             return success_response("Lesson marked as complete.", data={'enrollment': enrollment.to_dict()})
-        else:
-             # Already completed all or more than total (data issue?)
-             current_app.logger.warning(f"Attempt to mark lesson {lesson_id} complete, but progress already {enrollment.lessons_completed}/{total_lessons}")
-             return success_response("Progress already at maximum.", data={'enrollment': enrollment.to_dict()}, status_code=200)
+             # --- Simple Increment (Current Implementation) ---
+             enrollment.lessons_completed += 1 # Increment progress count
+             progress_updated = True
+
+        # Add the time spent on this lesson to the total time
+        enrollment.time_spent_seconds += round(time_increment_seconds) # Add the received time
+
+        db.session.commit()
+        current_app.logger.info(
+            f"Lesson {lesson_id} marked complete for user {current_user.user_id} in course {course_id}. "
+            f"Progress: {enrollment.lessons_completed}/{total_lessons}. "
+            f"Time increment: {time_increment_seconds:.1f}s. "
+            f"Total time: {enrollment.time_spent_seconds}s."
+        )
+        # Return the updated enrollment details
+        return success_response(
+            "Lesson marked as complete and time updated." if progress_updated else "Lesson completion status noted and time updated.",
+            data={'enrollment': enrollment.to_dict()}
+        )
 
     except Exception as e:
         db.session.rollback()
-        current_app.logger.error(f"Error marking lesson complete: {e}", exc_info=True)
-        return error_response("Failed to update progress.", 500)
-    # --- End Simple Increment ---
+        current_app.logger.error(f"Error marking lesson complete/updating time: {e}", exc_info=True)
+        return error_response("Failed to update progress or time.", 500)
 
 
-# --- Reviews ---
+
+
 @courses_bp.route("/<int:course_id>/review", methods=["POST"])
 @token_required
 def add_or_update_review(course_id):
@@ -791,6 +769,9 @@ def add_or_update_review(course_id):
         db.session.rollback(); current_app.logger.error(f"Error saving review: {e}", exc_info=True)
         return error_response("Error saving review.", 500)
 
+
+
+
 @courses_bp.route("/<int:course_id>/review", methods=["GET"])
 @token_required
 def get_my_review(course_id):
@@ -799,6 +780,8 @@ def get_my_review(course_id):
     review = Review.query.filter_by(user_id=current_user.user_id, course_id=course_id).first()
     if review: return success_response("Review fetched.", data={'review': review.to_dict()})
     else: return success_response("No review found.", data={'review': None}, status_code=200)
+
+
 
 
 @courses_bp.route("/<int:course_id>/reviews", methods=["GET"])
@@ -810,7 +793,8 @@ def get_course_reviews(course_id):
     return success_response("Fetched course reviews.", data={'reviews': reviews_data})
 
 
-# --- NEW ROUTE: Course Enrollment Details (for Creator) ---
+
+
 @courses_bp.route("/<int:course_id>/enrollment-details", methods=["GET"])
 @token_required
 def get_course_enrollment_details(course_id):

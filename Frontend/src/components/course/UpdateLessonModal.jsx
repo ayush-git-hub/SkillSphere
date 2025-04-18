@@ -1,7 +1,5 @@
-// src/components/course/UpdateLessonModal.jsx
-// New component for updating lessons
 import React, { useState, useEffect } from "react";
-import { updateLesson } from "../../services/api"; // API function
+import { updateLesson } from "../../services/api";
 import { useToast } from "../../hooks/useToast";
 import { UploadCloud, FileText, X as CloseIcon } from "lucide-react";
 import Input from "../common/Input";
@@ -13,21 +11,19 @@ const UpdateLessonModal = ({ courseId, lessonData, closeModalFunc, onUpdateSucce
         lesson_description: "",
     };
     const [formData, setFormData] = useState(initialFormState);
-    const [lessonVideo, setLessonVideo] = useState(null); // New video file
-    const [lessonAssignment, setLessonAssignment] = useState(null); // New assignment file
+    const [lessonVideo, setLessonVideo] = useState(null);
+    const [lessonAssignment, setLessonAssignment] = useState(null);
     const [loading, setLoading] = useState(false);
-    const [videoFileName, setVideoFileName] = useState(""); // For displaying new filename
-    const [assignmentFileName, setAssignmentFileName] = useState(""); // For displaying new filename
+    const [videoFileName, setVideoFileName] = useState("");
+    const [assignmentFileName, setAssignmentFileName] = useState("");
     const { success: showSuccessToast, error: showErrorToast } = useToast();
 
-    // Pre-fill form with existing lesson data
     useEffect(() => {
         if (lessonData) {
             setFormData({
                 lesson_title: lessonData.lesson_title || "",
                 lesson_description: lessonData.lesson_description || "",
             });
-            // Reset file inputs on modal open
             setLessonVideo(null);
             setLessonAssignment(null);
             setVideoFileName("");
@@ -43,8 +39,8 @@ const UpdateLessonModal = ({ courseId, lessonData, closeModalFunc, onUpdateSucce
     const handleFileChange = (e) => {
         const { name, files } = e.target;
         const file = files[0];
-        const maxSizeVideo = 500 * 1024 * 1024; // 500MB
-        const maxSizeAssignment = 50 * 1024 * 1024; // 50MB
+        const maxSizeVideo = 500 * 1024 * 1024;
+        const maxSizeAssignment = 50 * 1024 * 1024;
 
         if (file) {
             if (name === 'lesson_video' && file.size > maxSizeVideo) {
@@ -62,7 +58,6 @@ const UpdateLessonModal = ({ courseId, lessonData, closeModalFunc, onUpdateSucce
                 setLessonAssignment(file); setAssignmentFileName(file.name);
             }
         } else {
-            // Clear file state if selection is cancelled
             if (name === 'lesson_video') { setLessonVideo(null); setVideoFileName(""); }
             if (name === 'lesson_assignment') { setLessonAssignment(null); setAssignmentFileName(""); }
         }
@@ -80,7 +75,6 @@ const UpdateLessonModal = ({ courseId, lessonData, closeModalFunc, onUpdateSucce
         formPayload.append("lesson_title", formData.lesson_title);
         formPayload.append("lesson_description", formData.lesson_description || "");
 
-        // Only append files if they are selected for update
         if (lessonVideo) {
             formPayload.append("lesson_video", lessonVideo);
         }
@@ -91,8 +85,8 @@ const UpdateLessonModal = ({ courseId, lessonData, closeModalFunc, onUpdateSucce
         try {
             await updateLesson(courseId, lessonData.lesson_id, formPayload);
             showSuccessToast("Lesson updated successfully!");
-            onUpdateSuccess(); // Callback to refresh data in parent
-            closeModalFunc(); // Close modal
+            onUpdateSuccess();
+            closeModalFunc();
         } catch (error) {
             console.error("Update lesson error:", error);
             showErrorToast(error.message || "Failed to update lesson.");
@@ -101,20 +95,17 @@ const UpdateLessonModal = ({ courseId, lessonData, closeModalFunc, onUpdateSucce
         }
     };
 
-    if (!lessonData) return null; // Don't render if no lesson data
+    if (!lessonData) return null;
 
     return (
-        // Modal Backdrop & Container
         <div
             className="fixed inset-0 bg-background/80 backdrop-blur-sm flex justify-center items-center z-[100] p-4"
             onClick={closeModalFunc} role="dialog" aria-modal="true" aria-labelledby="update-lesson-title"
         >
-            {/* Modal Content */}
             <div
                 className="card w-full max-w-lg relative p-6 sm:p-8 max-h-[90vh] overflow-y-auto" // Allow scrolling
                 onClick={(e) => e.stopPropagation()}
             >
-                {/* Close Button */}
                 <Button
                     variant="ghost" size="icon" onClick={closeModalFunc}
                     className="absolute top-3 right-3 h-8 w-8" aria-label="Close update lesson modal"
@@ -122,10 +113,8 @@ const UpdateLessonModal = ({ courseId, lessonData, closeModalFunc, onUpdateSucce
                     <CloseIcon size={20} />
                 </Button>
 
-                {/* Title */}
                 <h2 id="update-lesson-title" className="text-xl sm:text-2xl font-semibold mb-6 text-center text-card-foreground">Update Lesson</h2>
 
-                {/* Form */}
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <Input
                         id="update_lesson_title" label="Lesson Title" name="lesson_title"
@@ -141,7 +130,6 @@ const UpdateLessonModal = ({ courseId, lessonData, closeModalFunc, onUpdateSucce
                         />
                     </div>
 
-                    {/* Video Upload */}
                     <div className="space-y-1">
                         <label className="block text-sm font-medium text-foreground">Update Lesson Video (Optional)</label>
                         <p className="text-xs text-muted-foreground mb-1">Current: {lessonData.lesson_video_url ? <a href={lessonData.lesson_video_url} target="_blank" rel="noreferrer" className="text-primary underline">View Video</a> : 'None'}</p>
@@ -163,7 +151,6 @@ const UpdateLessonModal = ({ courseId, lessonData, closeModalFunc, onUpdateSucce
                         </div>
                     </div>
 
-                    {/* Assignment Upload */}
                     <div className="space-y-1">
                         <label className="block text-sm font-medium text-foreground">Update Assignment/Resources (Optional)</label>
                         <p className="text-xs text-muted-foreground mb-1">Current: {lessonData.lesson_assignment_url ? <a href={lessonData.lesson_assignment_url} target="_blank" rel="noreferrer" className="text-primary underline">View Resources</a> : 'None'}</p>

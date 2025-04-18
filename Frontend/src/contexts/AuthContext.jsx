@@ -1,5 +1,3 @@
-// FRONTEND/src/contexts/AuthContext.jsx
-// Ensure updateUserState correctly stringifies data for localStorage
 import React, { createContext, useState, useEffect, useCallback, useContext } from 'react';
 import { useToast } from '../hooks/useToast';
 
@@ -41,7 +39,6 @@ export const AuthProvider = ({ children }) => {
 
     const login = useCallback((token, userData) => {
         localStorage.setItem('authToken', token);
-        // Ensure userData is stringified before storing
         localStorage.setItem('userData', JSON.stringify(userData));
         setIsAuthenticated(true);
         setUser(userData);
@@ -56,15 +53,14 @@ export const AuthProvider = ({ children }) => {
 
     const updateUserState = useCallback((updatedUserData) => {
         if (updatedUserData && updatedUserData.user_id) {
-            setUser(updatedUserData); // Update context state
-            // Ensure updatedUserData is stringified before storing in localStorage
+            setUser(updatedUserData);
             localStorage.setItem('userData', JSON.stringify(updatedUserData));
             console.log("AuthContext: User state updated in context and localStorage:", updatedUserData);
         } else {
             console.error("AuthContext: Attempted to update user state with invalid data:", updatedUserData);
             showErrorToast("Failed to update user session data correctly.");
         }
-    }, [showErrorToast]); // Include dependencies
+    }, [showErrorToast]);
 
     const value = { isLoading, isAuthenticated, user, login, logout, updateUserState };
 

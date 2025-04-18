@@ -4,13 +4,18 @@ from PIL import Image
 from werkzeug.utils import secure_filename
 from flask import current_app
 
+
+
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
-# THUMBNAIL_SIZE removed
+
+
 
 def allowed_file(filename):
     """Checks if the file extension is allowed."""
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
 
 def save_profile_image(image_file):
     """
@@ -26,10 +31,8 @@ def save_profile_image(image_file):
         ext = filename.rsplit('.', 1)[1].lower()
         unique_id = uuid.uuid4().hex
         original_filename = f"{unique_id}_original.{ext}"
-        # thumbnail_filename removed
 
         original_path = os.path.join(current_app.config['PROFILE_IMAGE_FOLDER'], original_filename)
-        # thumbnail_path removed
 
         # Save original image
         # Ensure the stream is rewound before saving if it was read previously
@@ -37,9 +40,7 @@ def save_profile_image(image_file):
         image_file.save(original_path)
         current_app.logger.info(f"Profile image saved to: {original_path}")
 
-        # Thumbnail creation logic removed
-
-        return original_filename # Only return original filename
+        return original_filename 
     except Exception as e:
         current_app.logger.error(f"Error processing profile image: {e}", exc_info=True)
         # Clean up potentially partially saved files if needed
@@ -49,9 +50,8 @@ def save_profile_image(image_file):
                 current_app.logger.info(f"Cleaned up partially saved profile image: {original_path}")
             except OSError as rm_err:
                 current_app.logger.error(f"Error removing partially saved file {original_path}: {rm_err}")
-        # if 'thumbnail_path' in locals() and os.path.exists(thumbnail_path):
-        #      os.remove(thumbnail_path) # Cleanup removed
         return None
+
 
 
 def save_course_thumbnail(image_file):
@@ -70,13 +70,6 @@ def save_course_thumbnail(image_file):
         thumbnail_filename = f"course_{unique_id}.{ext}"
         # Use the renamed config key for the save path
         save_path = os.path.join(current_app.config['COURSE_THUMBNAIL_IMAGE_FOLDER'], thumbnail_filename)
-
-        # Optional: Resize course thumbnail if needed
-        # with Image.open(image_file.stream) as img:
-        #     img.thumbnail((800, 450)) # Example size
-        #     if img.mode in ("P", "RGBA"):
-        #         img = img.convert("RGB")
-        #     img.save(save_path)
 
         # Save original size if no resizing
         # Ensure stream is rewound

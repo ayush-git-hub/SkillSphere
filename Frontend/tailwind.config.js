@@ -4,13 +4,13 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
-  darkMode: 'class', // Enable class-based dark mode (will be toggled via JS)
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))", // Focus ring
+        ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
@@ -50,7 +50,7 @@ export default {
       keyframes: {
         "accordion-down": {
           from: { height: "0" },
-          to: { height: "var(--radix-accordion-content-height)" }, // Use Radix variable if applicable, otherwise use a fixed/max height
+          to: { height: "var(--radix-accordion-content-height)" },
         },
         "accordion-up": {
           from: { height: "var(--radix-accordion-content-height)" },
@@ -73,5 +73,5 @@ export default {
       },
     },
   },
-  plugins: [require('@tailwindcss/typography')], // Added for prose styling if using markdown
+  plugins: [require('@tailwindcss/typography')],
 };

@@ -1,26 +1,20 @@
-
-
-
-// src/pages/auth/SigninPage.jsx
-// No longer needs login prop, uses context
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Mail, Lock } from "lucide-react";
 import { signinUser } from "../../services/api";
 import { useToast } from "../../hooks/useToast";
-import { useAuthContext } from "../../contexts/AuthContext"; // Import context hook
+import { useAuthContext } from "../../contexts/AuthContext";
 import AuthFormWrapper from "../../components/auth/AuthFormWrapper";
 import Input from "../../components/common/Input";
 import Button from "../../components/common/Button";
 
-// No longer needs login prop
 const SigninPage = () => {
     const [formData, setFormData] = useState({ email: "", password: "" });
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
     const { success: showSuccessToast, error: showErrorToast } = useToast();
-    const { login } = useAuthContext(); // Get login function from context
+    const { login } = useAuthContext();
 
     const from = location.state?.from?.pathname || "/explore";
 
@@ -35,7 +29,7 @@ const SigninPage = () => {
         try {
             const responseData = await signinUser(formData);
             if (responseData.token && responseData.user) {
-                login(responseData.token, responseData.user); // Use login from context
+                login(responseData.token, responseData.user);
                 showSuccessToast("Sign in successful! Redirecting...");
                 navigate(from, { replace: true });
             } else {

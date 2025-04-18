@@ -1,11 +1,9 @@
-// src/components/layout/Navbar.jsx
-// Updated to consume AuthContext directly
 import React, { useState } from 'react';
 import { LogOut, Settings, Menu, X, Sun, Moon, ChevronDown } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import UpdateDetailsModal from '../shared/UpdateDetailsModal';
 import { useTheme } from '../../contexts/ThemeContext';
-import { useAuthContext } from '../../contexts/AuthContext'; // Import context hook
+import { useAuthContext } from '../../contexts/AuthContext';
 import useClickOutside from '../../hooks/useClickOutside';
 import Button from '../common/Button';
 import PlaceholderAvatar from '../../assets/svgs/placeholder-image.svg';
@@ -13,13 +11,6 @@ import { useToast } from "../../hooks/useToast";
 
 const LogoIcon = () => (
     <Link to="/explore" className="flex items-center gap-2 flex-shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm" aria-label="Go to homepage">
-        {/* <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-primary">
-            <path d="M12 2L2 7V17L12 22L22 17V7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            <path d="M2 7L12 12L22 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            <path d="M12 12V22" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            <path d="M17 4.5L7 9.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            <path d="M17 19.5L7 14.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-        </svg> */}
         <svg width="20" height="20" xmlns="http://www.w3.org/2000/svg">
             <path d="M100,150 C80,120 60,100 40,80 C20,60 30,40 50,30 C70,20 90,30 110,40 C130,50 150,70 170,90 C190,110 180,130 160,140 Z" fill="none" stroke="black" stroke-width="2" />
             <path d="M110,40 L120,30 L130,20 L140,30 L150,40" fill="black" />
@@ -29,7 +20,6 @@ const LogoIcon = () => (
     </Link>
 );
 
-// No longer needs user, logout, updateUserState as props, uses context instead
 const NavBar = ({ toggleSidebar, isSidebarOpen }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
@@ -39,16 +29,14 @@ const NavBar = ({ toggleSidebar, isSidebarOpen }) => {
     const { success: showSuccessToast } = useToast();
     const from = "/signin";
 
-    // Get user, logout, and updateUserState from AuthContext
     const { user, logout, updateUserState } = useAuthContext();
 
     const openModal = () => { setIsModalOpen(true); setIsUserMenuOpen(false); };
     const closeModal = () => { setIsModalOpen(false); };
 
     const handleLogout = () => {
-        logout(); // Call logout from context
+        logout();
         showSuccessToast("Logout successful! Redirecting...");
-        // Navigate after state update (context handles localStorage)
         setTimeout(() => navigate(from, { replace: true }), 0);
         setIsUserMenuOpen(false);
     };
@@ -69,8 +57,7 @@ const NavBar = ({ toggleSidebar, isSidebarOpen }) => {
                     <Button variant="ghost" size="icon" onClick={toggleTheme} aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}>
                         {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
                     </Button>
-                    {/* User Menu uses user from context */}
-                    {user && ( // Only show menu if user exists in context
+                    {user && (
                         <div className="relative" ref={userMenuRef}>
                             <button
                                 className="flex items-center gap-2 p-1 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card hover:bg-accent transition-colors"
@@ -99,13 +86,10 @@ const NavBar = ({ toggleSidebar, isSidebarOpen }) => {
                     )}
                 </div>
             </nav>
-            {/* Modal uses user and updateUserState from context */}
             {isModalOpen && user && (
                 <UpdateDetailsModal
                     closeModalFunc={closeModal}
-                    // Pass current user from context
                     currentUser={{ user_id: user.user_id, name: user.name, email: user.email }}
-                    // Pass update function from context
                     onUpdateSuccess={updateUserState}
                 />
             )}

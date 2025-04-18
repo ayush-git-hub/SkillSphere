@@ -1,4 +1,3 @@
-# BACKEND/app/models/enrollment.py
 from datetime import datetime
 from app.extensions import db
 
@@ -54,5 +53,5 @@ class Enrollment(db.Model):
             'lessons_completed': self.lessons_completed,
             'total_lessons': total_lessons,
             'progress_percentage': progress_percentage,
-            'time_spent_seconds': self.time_spent_seconds # Include tracked time
+            'time_spent_seconds': self.time_spent_seconds 
         }

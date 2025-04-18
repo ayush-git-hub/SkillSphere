@@ -1,4 +1,3 @@
-# BACKEND/app/services/minio_service.py
 import logging
 from minio import Minio
 from minio.error import S3Error
@@ -7,8 +6,7 @@ from flask import current_app
 import io
 import tempfile
 import os
-# moviepy might be heavy, consider alternatives if only duration is needed
-# or keep it if other video processing is planned.
+
 try:
     from moviepy.editor import VideoFileClip
     MOVIEPY_AVAILABLE = True
@@ -18,15 +16,18 @@ except ImportError:
 
 
 # Configure logging
-# logging.basicConfig(level=logging.INFO) # Already configured by Flask/Gunicorn usually
 logger = logging.getLogger(__name__) # Use Flask's logger
 
+
+
 minio_client = None
+
+
 
 def initialize_minio():
     """Initializes the MinIO client using app config."""
     global minio_client
-    if minio_client is None and current_app: # Ensure app context exists
+    if minio_client is None and current_app: 
         try:
             config = current_app.config
             if not all(k in config for k in ['MINIO_ENDPOINT', 'MINIO_ACCESS_KEY', 'MINIO_SECRET_KEY', 'MINIO_BUCKET']):
@@ -37,7 +38,7 @@ def initialize_minio():
                 endpoint=config['MINIO_ENDPOINT'],
                 access_key=config['MINIO_ACCESS_KEY'],
                 secret_key=config['MINIO_SECRET_KEY'],
-                secure=config.get('MINIO_SECURE', False) # Use get with default
+                secure=config.get('MINIO_SECURE', False) 
             )
             # Ensure bucket exists
             bucket_name = config['MINIO_BUCKET']
@@ -57,14 +58,17 @@ def initialize_minio():
         logger.warning("initialize_minio called outside of Flask app context or MinIO disabled.")
 
 
+
 def get_minio_client():
     """Returns the initialized MinIO client. Tries to initialize if needed."""
     if minio_client is None:
          logger.warning("Attempting to get MinIO client before explicit initialization. Trying now...")
-         initialize_minio() # Attempt initialization within app context if called late
+         initialize_minio() 
     if minio_client is None:
         logger.error("MinIO client is not configured or failed to initialize.")
     return minio_client
+
+
 
 def upload_file_to_minio(file_stream, object_name, content_type, bucket_name=None):
     """Uploads a file stream to MinIO."""
@@ -113,6 +117,8 @@ def upload_file_to_minio(file_stream, object_name, content_type, bucket_name=Non
     except Exception as e:
         logger.error(f"Error uploading file '{object_name}' to MinIO: {e}", exc_info=True)
         return None
+
+
 
 def delete_file_from_minio(object_name, bucket_name=None):
     """Deletes a file from MinIO."""
@@ -172,6 +178,8 @@ def get_presigned_url(object_name, expires_hours=24, bucket_name=None):
     except Exception as e:
        logger.error(f"Error generating presigned URL for '{object_name}': {e}", exc_info=True)
        return None
+
+
 
 def get_video_duration(video_file_storage):
     """Calculates video duration using moviepy. Returns duration in seconds."""

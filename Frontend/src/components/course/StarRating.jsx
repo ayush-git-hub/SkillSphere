@@ -1,13 +1,12 @@
 import React from 'react';
 import { Star } from 'lucide-react';
 
-// Interactive Star Rating Component
 const StarRating = ({ rating, onChange, size = 'md', readOnly = false, className = "" }) => {
     const stars = [1, 2, 3, 4, 5];
     const starSizeClasses = {
         sm: 'h-4 w-4',
-        md: 'h-5 w-5', // Default size
-        lg: 'h-7 w-7', // Larger size
+        md: 'h-5 w-5',
+        lg: 'h-7 w-7',
     };
     const currentSize = starSizeClasses[size] || starSizeClasses.md;
 
@@ -16,7 +15,7 @@ const StarRating = ({ rating, onChange, size = 'md', readOnly = false, className
             {stars.map((star) => (
                 <button
                     key={star}
-                    type="button" // Prevent form submission
+                    type="button"
                     onClick={!readOnly ? () => onChange(star) : undefined}
                     className={`transition-colors duration-150 ease-in-out focus:outline-none rounded-sm focus-visible:ring-2 focus-visible:ring-ring
                         ${star <= rating ? "text-yellow-400 dark:text-yellow-500" : "text-muted-foreground/40"}
@@ -24,10 +23,9 @@ const StarRating = ({ rating, onChange, size = 'md', readOnly = false, className
                     `}
                     aria-label={readOnly ? `${rating} out of 5 stars` : `Rate ${star} out of 5 stars`}
                     disabled={readOnly}
-                    // Add aria-pressed for interactive mode
                     aria-pressed={!readOnly && star === rating}
                 >
-                    <Star className={`${currentSize} fill-current`} /> {/* Fill based on text color */}
+                    <Star className={`${currentSize} fill-current`} />
                 </button>
             ))}
         </div>
@@ -35,10 +33,9 @@ const StarRating = ({ rating, onChange, size = 'md', readOnly = false, className
 };
 
 
-// Display-Only Star Rating Component (non-interactive)
 export const StarRatingDisplay = ({ rating, size = 'md', className = "" }) => {
     return <StarRating rating={rating} onChange={() => { }} size={size} readOnly={true} className={className} />;
 }
 
 
-export default StarRating; // Export the interactive one as default
+export default StarRating; 

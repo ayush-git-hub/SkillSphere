@@ -1,14 +1,15 @@
-# BACKEND/app/routes/users.py
 import os
 from flask import request, g, current_app
 from sqlalchemy.orm import joinedload
 from app.extensions import db, bcrypt
-from app.models import User, Course, Enrollment, Review # Import necessary models
+from app.models import User, Course, Enrollment, Review 
 from app.utils.responses import success_response, error_response
 from app.middleware.auth_middleware import token_required
 from app.utils.image_processor import save_profile_image
-from app.services.minio_service import delete_file_from_minio # Import delete function
-from . import users_bp # Import the blueprint
+from app.services.minio_service import delete_file_from_minio 
+from . import users_bp 
+
+
 
 @users_bp.route("/profile", methods=["GET"])
 @token_required
@@ -17,7 +18,8 @@ def get_profile():
     current_user = g.current_user
     return success_response("Profile fetched successfully.", data=current_user.to_dict())
 
-# --- MODIFIED Route for Update ---
+
+
 @users_bp.route("/profile/update", methods=["PUT"])
 @token_required
 def update_details():
@@ -130,60 +132,6 @@ def update_details():
         return error_response("Failed to update profile due to a server error.", 500)
 
 
-# # --- NEW ROUTE: User Detail ---
-# @users_bp.route("/<int:user_id>/details", methods=["GET"])
-# @token_required # Protect this route, adjust permissions as needed
-# def get_user_details(user_id):
-#     """
-#     Get complete details of a user, including personal details,
-#     enrolled courses, and created courses.
-#     Currently only accessible by the user themselves or potentially admins.
-#     """
-#     current_user = g.current_user
-
-#     # --- Permission Check (Example: Allow self or admin) ---
-#     # is_admin = False # Add admin role check logic if needed
-#     if current_user.user_id != user_id: # and not is_admin:
-#          return error_response("Forbidden: You can only view your own details.", 403)
-
-#     # --- Fetch User ---
-#     user = User.query.get(user_id)
-#     if not user:
-#         return error_response("User not found.", 404)
-
-#     # --- Fetch Enrolled Courses ---
-#     # Use joinedload to efficiently load related course and category
-#     enrollments = Enrollment.query.options(
-#         joinedload(Enrollment.course).joinedload(Course.category),
-#         joinedload(Enrollment.course).joinedload(Course.creator) # Load creator too if needed
-#     ).filter(Enrollment.learner_id == user_id).all()
-
-#     enrolled_courses_list = []
-#     for enrollment in enrollments:
-#         if enrollment.course: # Ensure course exists
-#             course_data = enrollment.course.to_dict(include_category=True, include_creator=True)
-#             # Add enrollment specific details like progress to the course data for this context
-#             course_data['enrollment_details'] = enrollment.to_dict() # Includes progress % etc.
-#             enrolled_courses_list.append(course_data)
-
-#     # --- Fetch Created Courses ---
-#     created_courses = Course.query.options(
-#         joinedload(Course.category) # Load category
-#     ).filter(Course.creator_id == user_id).order_by(Course.updated_date.desc()).all()
-
-#     created_courses_list = [
-#         course.to_dict(include_category=True, include_stats=True) # Include avg rating maybe?
-#         for course in created_courses
-#     ]
-
-#     # --- Prepare Response ---
-#     response_data = {
-#         "user": user.to_dict(), # Basic user details
-#         "enrolled_courses": enrolled_courses_list,
-#         "created_courses": created_courses_list
-#     }
-
-#     return success_response("User details fetched successfully.", data=response_data)
 
 
 @users_bp.route("/<int:user_id>/details", methods=["GET"])

@@ -1,18 +1,16 @@
 import React from 'react';
 
-// Simple SVG Spinner - Customize as needed
 const LoadingSpinner = ({ size = 'h-8 w-8', color = 'text-primary', className = '' }) => {
     return (
         <svg
-            // Inherit color by default, unless explicitly overridden
             className={`animate-spin ${size} ${color ? color : 'text-inherit'} ${className}`}
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
-            aria-hidden="true" // Hide from screen readers
-            role="status" // Indicate loading status
+            aria-hidden="true"
+            role="status"
         >
-            <title>Loading...</title> {/* Provide accessible name */}
+            <title>Loading...</title>
             <circle
                 className="opacity-25"
                 cx="12"

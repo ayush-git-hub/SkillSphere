@@ -1,7 +1,6 @@
 import { useContext } from 'react';
 import ToastContext from '../contexts/ToastContext';
 
-// Custom hook to easily access toast functions
 export const useToast = () => {
     const context = useContext(ToastContext);
     if (!context) {

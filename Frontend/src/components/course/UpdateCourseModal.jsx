@@ -1,5 +1,3 @@
-// FRONTEND/src/components/course/UpdateCourseModal.jsx
-// Updated: Dual Category Input
 import React, { useState, useEffect } from "react";
 import { updateCourse, fetchCategories } from "../../services/api";
 import { useToast } from "../../hooks/useToast";
@@ -12,9 +10,9 @@ const UpdateCourseModal = ({ courseData, closeModalFunc, onUpdateSuccess }) => {
     const initialFormState = {
         course_title: "", course_description: "", price: "",
         difficulty_level: "", language: "",
-        new_category: "", // Holds typed category name
-        existing_category_id: "", // Holds selected ID
-        category_name: "", // Final name to submit
+        new_category: "",
+        existing_category_id: "",
+        category_name: "",
     };
     const [formData, setFormData] = useState(initialFormState);
     const [thumbnailImage, setThumbnailImage] = useState(null);
@@ -35,9 +33,9 @@ const UpdateCourseModal = ({ courseData, closeModalFunc, onUpdateSuccess }) => {
                 price: courseData.price !== null ? String(courseData.price) : "",
                 difficulty_level: courseData.difficulty_level || "",
                 language: courseData.language || "",
-                new_category: currentCategoryName, // Pre-fill text input
-                existing_category_id: "", // Reset dropdown selection
-                category_name: currentCategoryName, // Set initial final name
+                new_category: currentCategoryName,
+                existing_category_id: "",
+                category_name: currentCategoryName,
             });
             setThumbnailImage(null); setThumbnailName(""); setThumbnailPreview(null);
         }
@@ -49,7 +47,6 @@ const UpdateCourseModal = ({ courseData, closeModalFunc, onUpdateSuccess }) => {
             try {
                 const data = await fetchCategories();
                 setCategories(data.categories || []);
-                // After categories load, try to find the current course's category ID
                 if (courseData?.category_name && data.categories) {
                     const currentCat = data.categories.find(c => c.category_name === courseData.category_name);
                     if (currentCat) {
@@ -61,18 +58,16 @@ const UpdateCourseModal = ({ courseData, closeModalFunc, onUpdateSuccess }) => {
             } finally { setLoadingCategories(false); }
         };
         loadCategories();
-    }, [showErrorToast, courseData?.category_name]); // Reload if course category name changes (unlikely but safe)
+    }, [showErrorToast, courseData?.category_name]);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
-        // Dual Category: Typing in new_category updates final name and clears selection
         if (name === 'new_category') {
             setFormData((prev) => ({ ...prev, existing_category_id: "", category_name: value }));
         }
     };
 
-    // Dual Category: Handle Dropdown Selection
     const handleExistingCategoryChange = (e) => {
         const selectedCategoryId = e.target.value;
         const selectedCategory = categories.find(cat => cat.category_id === parseInt(selectedCategoryId));
@@ -80,8 +75,8 @@ const UpdateCourseModal = ({ courseData, closeModalFunc, onUpdateSuccess }) => {
             setFormData((prev) => ({
                 ...prev,
                 existing_category_id: selectedCategoryId,
-                new_category: selectedCategory.category_name, // Autofill text
-                category_name: selectedCategory.category_name, // Update final name
+                new_category: selectedCategory.category_name,
+                category_name: selectedCategory.category_name,
             }));
         } else {
             setFormData((prev) => ({ ...prev, existing_category_id: "" }));
@@ -92,7 +87,7 @@ const UpdateCourseModal = ({ courseData, closeModalFunc, onUpdateSuccess }) => {
     const handleThumbnailImageChange = (e) => {
         const file = e.target.files[0];
         if (file && file.type.startsWith("image/")) {
-            if (file.size > 5 * 1024 * 1024) { // 5MB limit
+            if (file.size > 5 * 1024 * 1024) {
                 showErrorToast("Image size cannot exceed 5MB."); e.target.value = '';
                 setThumbnailImage(null); setThumbnailName(""); setThumbnailPreview(null); return;
             }
@@ -119,7 +114,7 @@ const UpdateCourseModal = ({ courseData, closeModalFunc, onUpdateSuccess }) => {
         formPayload.append("price", formData.price);
         formPayload.append("difficulty_level", formData.difficulty_level);
         formPayload.append("language", formData.language);
-        formPayload.append("category_name", formData.category_name.trim()); // Submit final name
+        formPayload.append("category_name", formData.category_name.trim());
         if (thumbnailImage) formPayload.append("thumbnail_image", thumbnailImage);
 
         try {
@@ -141,7 +136,6 @@ const UpdateCourseModal = ({ courseData, closeModalFunc, onUpdateSuccess }) => {
                 <h2 id="update-course-title" className="text-xl sm:text-2xl font-semibold mb-6 text-center">Update Course</h2>
                 {loadingCategories ? <div className="flex justify-center p-4"><LoadingSpinner /></div> : (
                     <form onSubmit={handleSubmit} className="space-y-6" encType="multipart/form-data">
-                        {/* Standard Inputs */}
                         <Input id="update_course_title" label="Title *" name="course_title" value={formData.course_title} onChange={handleInputChange} required disabled={loadingSubmit} />
                         <div className="space-y-1">
                             <label className="block text-sm font-medium">Thumbnail (Optional Update)</label>
@@ -176,7 +170,6 @@ const UpdateCourseModal = ({ courseData, closeModalFunc, onUpdateSuccess }) => {
                             </div>
                         </div>
 
-                        {/* Dual Category Input */}
                         <div className="space-y-4 card p-4 border border-border">
                             <label className="block text-sm font-medium text-foreground">Course Category *</label>
                             <div className="space-y-2">

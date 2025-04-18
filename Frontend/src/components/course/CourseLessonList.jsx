@@ -1,5 +1,3 @@
-// src/components/course/CourseLessonList.jsx
-// Updated: Removed lesson_order, uses lesson_id for key, sorts by lesson_id
 import React from 'react';
 import { Lock, PlayCircle } from 'lucide-react';
 
@@ -11,7 +9,6 @@ const CourseLessonList = ({
     isEnrolledView = false,
 }) => {
 
-    // Ensure lessons is always an array and sort by lesson_id
     const sortedLessons = React.useMemo(() =>
         [...(lessons || [])].sort((a, b) => (a.lesson_id ?? 0) - (b.lesson_id ?? 0)),
         [lessons]
@@ -32,7 +29,7 @@ const CourseLessonList = ({
 
                         return (
                             <button
-                                key={lesson.lesson_id} // Use lesson_id as key
+                                key={lesson.lesson_id}
                                 onClick={canClick ? () => onLessonClick(lesson) : undefined}
                                 disabled={!canClick}
                                 className={`w-full text-left rounded-md border shadow-sm transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background ${isSelected
@@ -47,12 +44,9 @@ const CourseLessonList = ({
                             >
                                 <div className="flex w-full items-center justify-between px-3 py-2.5 md:px-4 md:py-3">
                                     <span className="flex items-start gap-2 overflow-hidden mr-2">
-                                        {/* Display index+1 for visual order */}
                                         <span className="text-sm font-normal text-muted-foreground pt-px w-6 text-right flex-shrink-0">{index + 1}.</span>
                                         <span className={`flex-1 font-medium text-sm ${isSelected ? 'text-accent-foreground' : 'text-card-foreground'}`}>
                                             {lesson.lesson_title || "Untitled Lesson"}
-                                            {/* Display duration if available */}
-                                            {/* Convert seconds to minutes display if needed */}
                                             {lesson.duration && lesson.duration > 0 && (
                                                 <span className="block text-xs font-normal text-muted-foreground/80 mt-0.5">{Math.ceil(lesson.duration / 60)} min</span>
                                             )}

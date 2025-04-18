@@ -10,13 +10,12 @@ function useClickOutside(handler, listenCapturing = true) {
             }
         }
 
-        // Use capturing phase to detect clicks even if propagation is stopped inside
         document.addEventListener('click', handleClick, listenCapturing);
 
         return () => document.removeEventListener('click', handleClick, listenCapturing);
     }, [handler, listenCapturing]);
 
-    return ref; // Return the ref to attach to the element
+    return ref;
 }
 
 export default useClickOutside;

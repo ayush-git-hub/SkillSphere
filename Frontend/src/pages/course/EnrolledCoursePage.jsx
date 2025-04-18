@@ -1,7 +1,6 @@
-// updated
 import React, { useState, useEffect, useMemo } from "react";
 import { Search } from "lucide-react";
-import { fetchEnrolledCourses } from "../../services/api"; // Correct API function
+import { fetchEnrolledCourses } from "../../services/api";
 import CourseCard from "../../components/course/CourseCard";
 import PageLoader from "../../components/common/PageLoader";
 import { useToast } from "../../hooks/useToast";
@@ -21,9 +20,7 @@ const EnrolledCoursePage = () => {
             setLoading(true);
             setError(null);
             try {
-                // Backend identifies user via token
                 const data = await fetchEnrolledCourses();
-                // Backend returns { courses: [...] } in 'data'
                 setCourses(data.courses || []);
             } catch (err) {
                 console.error("Error fetching enrolled courses:", err);
@@ -35,7 +32,6 @@ const EnrolledCoursePage = () => {
             }
         };
         loadCourses();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const filteredCourses = useMemo(() => {
@@ -78,8 +74,7 @@ const EnrolledCoursePage = () => {
                                 <CourseCard
                                     key={course.course_id}
                                     course={course}
-                                    navigationLink={NAVIGATION_LINK}
-                                    isEnrolled={true} // Pass flag for card styling/button
+                                    viewType="enrolled"
                                 />
                             ))}
                         </div>

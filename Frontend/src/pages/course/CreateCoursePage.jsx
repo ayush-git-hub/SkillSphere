@@ -1,5 +1,3 @@
-// FRONTEND/src/pages/course/CreateCoursePage.jsx
-// Updated: Dual Category Input
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { fetchCategories, createCourse } from "../../services/api";
@@ -14,9 +12,9 @@ const CreateCoursePage = () => {
     const initialFormState = {
         course_title: "", course_description: "", price: "",
         difficulty_level: "", language: "",
-        new_category: "", // For creating new category
-        existing_category_id: "", // For selecting existing category
-        category_name: "", // Final category name to submit
+        new_category: "",
+        existing_category_id: "",
+        category_name: "",
     };
     const [formData, setFormData] = useState(initialFormState);
     const [thumbnailImage, setThumbnailImage] = useState(null);
@@ -28,13 +26,13 @@ const CreateCoursePage = () => {
 
     const navigate = useNavigate();
     const { success: showSuccessToast, error: showErrorToast } = useToast();
-    const { isAuthenticated } = useAuthContext(); // Use context
+    const { isAuthenticated } = useAuthContext();
 
     useEffect(() => {
         if (!isAuthenticated) {
             showErrorToast("You must be logged in to create a course.");
             navigate('/signin', { state: { from: '/created-course/create-new-course' } });
-            return; // Stop further execution if not authenticated
+            return;
         }
 
         const loadCategories = async () => {
@@ -51,23 +49,17 @@ const CreateCoursePage = () => {
             }
         };
         loadCategories();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isAuthenticated, navigate, showErrorToast]); // Depend on auth status
+    }, [isAuthenticated, navigate, showErrorToast]);
 
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
-
-        // --- Dual Category Logic ---
-        // If typing in new_category, clear existing selection and update final name
         if (name === 'new_category') {
             setFormData((prev) => ({ ...prev, existing_category_id: "", category_name: value }));
         }
-        // --- End Dual Category Logic ---
     };
 
-    // --- Dual Category Logic: Handle Dropdown Selection ---
     const handleExistingCategoryChange = (e) => {
         const selectedCategoryId = e.target.value;
         const selectedCategory = categories.find(cat => cat.category_id === parseInt(selectedCategoryId));
@@ -75,21 +67,18 @@ const CreateCoursePage = () => {
             setFormData((prev) => ({
                 ...prev,
                 existing_category_id: selectedCategoryId,
-                new_category: selectedCategory.category_name, // Autofill text input
-                category_name: selectedCategory.category_name, // Update final name
+                new_category: selectedCategory.category_name,
+                category_name: selectedCategory.category_name,
             }));
         } else {
-            // Handle "Select..." or invalid option if necessary
             setFormData((prev) => ({ ...prev, existing_category_id: "" }));
         }
     };
-    // --- End Dual Category Logic ---
-
 
     const handleThumbnailImageChange = (e) => {
         const file = e.target.files[0];
         if (file && file.type.startsWith("image/")) {
-            if (file.size > 5 * 1024 * 1024) { // 5MB limit validation
+            if (file.size > 5 * 1024 * 1024) {
                 showErrorToast("Image size cannot exceed 5MB."); e.target.value = '';
                 setThumbnailImage(null); setThumbnailName(""); setThumbnailPreview(null); return;
             }
@@ -107,7 +96,6 @@ const CreateCoursePage = () => {
         setLoadingSubmit(true);
 
         if (!thumbnailImage) { showErrorToast("Please upload a course thumbnail."); setLoadingSubmit(false); return; }
-        // Use the final category_name from state
         if (!formData.category_name.trim()) {
             showErrorToast("Please select or enter a course category."); setLoadingSubmit(false); return;
         }
@@ -118,7 +106,6 @@ const CreateCoursePage = () => {
         formPayload.append("price", formData.price);
         formPayload.append("difficulty_level", formData.difficulty_level);
         formPayload.append("language", formData.language);
-        // Submit the final category name
         formPayload.append("category_name", formData.category_name.trim());
         formPayload.append("thumbnail_image", thumbnailImage);
 
@@ -133,7 +120,6 @@ const CreateCoursePage = () => {
         }
     };
 
-    // Show loader while verifying or loading categories
     if (!isAuthenticated || loadingCategories) {
         return <PageLoader message={!isAuthenticated ? "Verifying..." : "Loading data..."} />;
     }
@@ -146,7 +132,6 @@ const CreateCoursePage = () => {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6" encType="multipart/form-data">
-                {/* Standard Fields */}
                 <Input id="course_title" label="Course Title *" name="course_title" value={formData.course_title} onChange={handleInputChange} required disabled={loadingSubmit} />
                 <div className="space-y-1">
                     <label htmlFor="thumbnail_image_input" className="block text-sm font-medium text-foreground">Course Thumbnail *</label>
@@ -179,8 +164,6 @@ const CreateCoursePage = () => {
                         </select>
                     </div>
                 </div>
-
-                {/* --- Dual Category Input Section --- */}
                 <div className="space-y-4 card p-4 border border-border">
                     <label className="block text-sm font-medium text-foreground">Course Category *</label>
                     <div className="space-y-2">
@@ -188,8 +171,6 @@ const CreateCoursePage = () => {
                             id="new_category" label="Enter New Category Name" name="new_category"
                             value={formData.new_category} onChange={handleInputChange}
                             placeholder="Or type a new one here..." disabled={loadingSubmit}
-                        // Make required only if dropdown isn't selected? Validation is tricky here.
-                        // Backend handles the final category_name requirement.
                         />
                         <p className="text-center text-xs text-muted-foreground my-1">OR</p>
                         <div className="space-y-1">
@@ -211,8 +192,6 @@ const CreateCoursePage = () => {
                         Final category to be used: <strong>{formData.category_name || '(Please select or enter)'}</strong>
                     </p>
                 </div>
-                {/* --- End Dual Category Input Section --- */}
-
                 <div className="flex justify-end pt-4">
                     <Button type="submit" variant="primary" size="lg" isLoading={loadingSubmit} disabled={loadingSubmit || loadingCategories}>
                         Create Course

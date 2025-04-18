@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search } from "lucide-react";
-import { fetchCreatedCourses } from "../../services/api"; // Correct API function
+import { fetchCreatedCourses } from "../../services/api";
 import CourseCard from "../../components/course/CourseCard";
 import CreateCourseCard from "../../components/shared/CreateCourseCard";
 import PageLoader from "../../components/common/PageLoader";
@@ -24,9 +24,7 @@ const CreatedCoursePage = () => {
             setLoading(true);
             setError(null);
             try {
-                // Backend identifies user via token
                 const data = await fetchCreatedCourses();
-                // Backend returns { courses: [...] } in 'data'
                 setCreatedCourses(data.courses || []);
             } catch (err) {
                 console.error("Error fetching created courses:", err);
@@ -38,7 +36,6 @@ const CreatedCoursePage = () => {
             }
         };
         loadCourses();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const filteredCourses = useMemo(() => {
@@ -79,25 +76,20 @@ const CreatedCoursePage = () => {
             {!error && (
                 <>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-                        {/* Create Card */}
                         <CreateCourseCard onClick={handleCreateCardClick} />
-                        {/* Existing Courses */}
                         {filteredCourses.map((course) => (
                             <CourseCard
                                 key={course.course_id}
                                 course={course}
-                                navigationLink={NAVIGATION_LINK}
-                                isCreatorView={true} // Pass flag for context (manage button)
+                                viewType="created"
                             />
                         ))}
                     </div>
-                    {/* Message when no courses */}
                     {createdCourses.length === 0 && !searchQuery && (
                         <div className="text-center py-10 text-muted-foreground bg-card border border-border rounded-md mt-6 sm:col-span-2 lg:col-span-3 xl:col-span-4">
                             <p>You haven't created any courses yet. Click the '+' card above to start!</p>
                         </div>
                     )}
-                    {/* Message when search yields no results */}
                     {filteredCourses.length === 0 && searchQuery && (
                         <div className="text-center py-10 text-muted-foreground bg-card border border-border rounded-md mt-6 sm:col-span-2 lg:col-span-3 xl:col-span-4">
                             <p>No created courses match your search.</p>

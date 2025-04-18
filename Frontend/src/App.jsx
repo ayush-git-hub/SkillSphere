@@ -1,19 +1,14 @@
-// FRONTEND/src/App.jsx
-// Add route for AuthorProfilePage
 import React, { Suspense, lazy } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useTheme } from './contexts/ThemeContext';
-import { useAuthContext } from './contexts/AuthContext'; // Use the context hook
+import { useAuthContext } from './contexts/AuthContext';
 
-// Layouts & Common
 import MainAppLayout from './components/layout/MainAppLayout';
 import PageLoader from './components/common/PageLoader';
 
-// Auth Pages (loaded eagerly)
 import SigninPage from './pages/auth/SigninPage';
 import SignupPage from './pages/auth/SignupPage';
 
-// Lazy Load Main App Pages
 const ExplorePage = lazy(() => import('./pages/course/ExplorePage'));
 const ExploreDetailPage = lazy(() => import('./pages/course/ExploreDetailPage'));
 const EnrolledCoursePage = lazy(() => import('./pages/course/EnrolledCoursePage'));
@@ -21,10 +16,9 @@ const EnrolledCourseDetailPage = lazy(() => import('./pages/course/EnrolledCours
 const CreatedCoursePage = lazy(() => import('./pages/course/CreatedCoursePage'));
 const CreatedCourseDetailPage = lazy(() => import('./pages/course/CreatedCourseDetailPage'));
 const CreateCoursePage = lazy(() => import('./pages/course/CreateCoursePage'));
-const AuthorProfilePage = lazy(() => import('./pages/course/AuthorProfilePage')); // Lazy load author page
+const AuthorProfilePage = lazy(() => import('./pages/course/AuthorProfilePage'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 
-// Protected Route Component
 const ProtectedRoute = ({ children }) => {
   const { isLoading, isAuthenticated } = useAuthContext();
   const location = useLocation();
@@ -42,10 +36,8 @@ const ProtectedRoute = ({ children }) => {
 
 function App() {
   const { theme } = useTheme();
-  // Get auth state directly from the context hook
   const { isLoading, isAuthenticated } = useAuthContext();
 
-  // Display loader during initial context loading
   if (isLoading) {
     return <PageLoader message="Initializing..." />;
   }
@@ -53,7 +45,6 @@ function App() {
   return (
     <Suspense fallback={<PageLoader message="Loading Page..." />}>
       <Routes>
-        {/* Auth Routes */}
         <Route
           path="/signin"
           element={isAuthenticated ? <Navigate to="/explore" replace /> : <SigninPage />}
@@ -63,12 +54,10 @@ function App() {
           element={isAuthenticated ? <Navigate to="/explore" replace /> : <SignupPage />}
         />
 
-        {/* Main Application Routes (Protected) */}
         <Route
           path="/*"
           element={
             <ProtectedRoute>
-              {/* MainAppLayout uses context internally, no need to pass props */}
               <MainAppLayout>
                 <Routes>
                   <Route index element={<Navigate to="/explore" replace />} />
@@ -79,7 +68,6 @@ function App() {
                   <Route path="/created-course" element={<CreatedCoursePage />} />
                   <Route path="/created-course/create-new-course" element={<CreateCoursePage />} />
                   <Route path="/created-course/:courseId" element={<CreatedCourseDetailPage />} />
-                  {/* New Author Profile Route */}
                   <Route path="/author/:authorId" element={<AuthorProfilePage />} />
                   <Route path="*" element={<NotFoundPage />} />
                 </Routes>

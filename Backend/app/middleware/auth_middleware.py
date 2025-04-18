@@ -1,8 +1,8 @@
 import jwt
 from functools import wraps
-from flask import request, g, current_app # Ensure current_app is imported
-from app.models.user import User # Import the User model
-from app.utils.responses import error_response # Import the error response helper
+from flask import request, g, current_app 
+from app.models.user import User 
+from app.utils.responses import error_response 
 
 # Decorator function to protect routes
 def token_required(f):

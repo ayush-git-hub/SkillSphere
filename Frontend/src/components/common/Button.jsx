@@ -2,14 +2,14 @@ import React from 'react';
 import LoadingSpinner from './LoadingSpinner';
 
 const Button = React.forwardRef(({
-    variant = 'primary', // primary, secondary, destructive, outline, ghost, link
-    size = 'md',         // sm, md, lg, icon
+    variant = 'primary',
+    size = 'md',
     isLoading = false,
     disabled = false,
     className = '',
     children,
-    icon: Icon, // Optional icon component
-    iconPosition = 'left', // left, right
+    icon: Icon,
+    iconPosition = 'left',
     ...props
 }, ref) => {
 
@@ -35,7 +35,7 @@ const Button = React.forwardRef(({
         ${sizeClasses[size]}
         ${isLoading ? 'cursor-wait' : ''}
         ${className}
-    `.trim().replace(/\s+/g, ' '); // Combine and cleanup whitespace
+    `.trim().replace(/\s+/g, ' ');
 
 
     return (
@@ -46,7 +46,6 @@ const Button = React.forwardRef(({
             {...props}
         >
             {isLoading ? (
-                // Spinner takes precedence
                 <LoadingSpinner
                     size={size === 'sm' ? 'h-4 w-4' : 'h-5 w-5'}
                     color={variant === 'primary' || variant === 'destructive' || variant === 'secondary' ? 'text-inherit' : 'text-primary'} // Adjust spinner color based on button text color
@@ -62,6 +61,6 @@ const Button = React.forwardRef(({
     );
 });
 
-Button.displayName = 'Button'; // For DevTools
+Button.displayName = 'Button';
 
 export default Button;
