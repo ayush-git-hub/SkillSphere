@@ -1,0 +1,48 @@
+# Python cache files
+__pycache__/
+*.py[cod]
+*.so
+*.pyo
+*.pyd
+
+# Virtual environment
+venv/
+
+# Environment variables
+.env
+.flaskenv
+
+# Bytecode cache and build
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# SQLite database
+instance/*.db
+
+# Media uploads
+/media/
+/media/images/
+/media/profile_image/
+
+# MinIO temp and system files
+minio_storage/
+!minio_storage/format.json  # Optional: Keep config file if necessary
+
+# Course content (user-generated)
+course-content/
+
+# IDE/editor specific
+.vscode/
+.idea/
+
+# System specific
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Docker override (optional)
+docker-compose.override.yml

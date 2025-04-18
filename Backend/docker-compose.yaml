@@ -1,0 +1,46 @@
+# Keep the existing docker-compose.yaml for MinIO
+version: '3.8' # Specify version if needed
+
+services:
+  minio: # Renamed for clarity
+    image: minio/minio
+    container_name: lms-minio # More specific name
+    environment:
+      # Use environment variables from .env if possible, or hardcode (less ideal)
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY:-admin} # Use value from .env or default to 'admin'
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY:-adminpassword} # Use value from .env or default
+    ports:
+      - "${MINIO_ENDPOINT_PORT:-9000}:9000" # Map host port from .env or default
+      - "9001:9001" # Console port
+    volumes:
+      - ./minio_storage:/data # Persist MinIO data on the host
+    command: server /data --console-address ":9001"
+    healthcheck: # Optional: Add healthcheck for MinIO
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+# Add your Flask backend service here if you want to run it in Docker too
+# Example:
+#  backend:
+#    build: . # Assumes Dockerfile in the root directory
+#    container_name: lms-backend
+#    ports:
+#      - "8000:8000"
+#    volumes:
+#      - .:/app # Mount current directory into /app inside container
+#    env_file:
+#      - .env # Load environment variables from .env
+#    depends_on:
+#      minio: # Wait for minio to be healthy (if healthcheck is defined)
+#         condition: service_healthy
+#    environment:
+#      - FLASK_APP=run.py
+#      - FLASK_ENV=development # Or production
+#      # Ensure database path works inside container if using SQLite
+#      - SQLALCHEMY_DATABASE_URI=sqlite:////app/lms.db # Example path inside container
+
+# Note: If running backend in Docker, ensure MINIO_ENDPOINT in .env is reachable
+# from the backend container (e.g., 'http://minio:9000' instead of 'localhost:9000')
+# and adjust the backend's depends_on setting.

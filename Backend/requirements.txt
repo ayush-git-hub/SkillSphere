@@ -1,0 +1,10 @@
+Flask
+Flask-SQLAlchemy
+Flask-Bcrypt
+Flask-Cors
+PyJWT[crypto]  
+Pillow        
+python-dotenv
+minio
+moviepy==1.0.3
+Werkzeug     
