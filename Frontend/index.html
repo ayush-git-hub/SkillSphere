@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en"> <!-- Theme class will be added by JS -->
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.png" /> <!-- Assuming logo.svg in public -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Skill Sphere</title>
+  <script>
+    // Immediately set theme class to prevent FOUC (Flash of Unstyled Content)
+    (function () {
+      const theme = localStorage.getItem('theme') || 'dark'; // Default to dark
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark'); // Ensure it's removed if light
+      }
+    })();
+  </script>
+</head>
+
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.jsx"></script>
+</body>
+
+</html>

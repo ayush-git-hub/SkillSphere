@@ -1,0 +1,22 @@
+version: '3.8'
+services:
+  minio:
+    # Renamed for clarity
+    image: minio/minio
+    container_name: lms-minio # More specific name
+    environment:
+      # Use environment variables from .env if possible, or hardcode (less ideal)
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY:-admin} # Use value from .env or default to 'admin'
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY:-adminpassword} # Use value from .env or default
+    ports:
+      - "${MINIO_ENDPOINT_PORT:-9000}:9000" # Map host port from .env or default
+      - "9001:9001" # Console port
+    volumes:
+      - ./minio_storage:/data # Persist MinIO data on the host
+    command: server /data --console-address ":9001"
+    healthcheck:
+      # Optional: Add healthcheck for MinIO
+      test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5

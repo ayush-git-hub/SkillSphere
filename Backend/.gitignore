@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+*.cpython-*
+
+venv/
+.env
+.flaskenv
+
+media/
+minio_storage/
+instance/
